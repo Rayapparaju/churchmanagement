@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Edit Church Information{% endblock %}
+
+{% block page_title %}Edit Church Information{% endblock %}
+
+{% block breadcrumb_items %}
+<li class="breadcrumb-item"><a href="{% url 'church_info' %}">Church Info</a></li>
+<li class="breadcrumb-item active" aria-current="page">Edit</li>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <span class="card-title"><i class="fa-solid fa-church me-2"></i>Church Information</span>
+            </div>
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data" novalidate>
+                    {% csrf_token %}
+
+                    <div class="row g-3">
+                        <div class="col-md-8">
+                            <label class="form-label">Church Name</label>
+                            {{ form.name }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Founded Date</label>
+                            {{ form.founded_date }}
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mt-2">
+                        <div class="col-12">
+                            <label class="form-label">Tagline</label>
+                            {{ form.tagline }}
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mt-2">
+                        <div class="col-12">
+                            <label class="form-label">Description</label>
+                            {{ form.description }}
+                        </div>
+                    </div>
+
+                    <h6 class="mt-4 mb-3 border-bottom pb-2">Contact Information</h6>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Phone</label>
+                            {{ form.phone }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Email</label>
+                            {{ form.email }}
+                        </div>
+                    </div>
+
+                    <div class="row g-3 mt-2">
+                        <div class="col-12">
+                            <label class="form-label">Address</label>
+                            {{ form.address }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Website</label>
+                            {{ form.website }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Logo</label>
+                            {{ form.logo }}
+                            {% if info.logo %}
+                            <small class="text-muted">Current: <a href="{{ info.logo.url }}" target="_blank">{{ info.logo.name }}</a></small>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <h6 class="mt-4 mb-3 border-bottom pb-2">Service Times</h6>
+                    <div class="row g-3">
+                        <div class="col-12">
+                            {{ form.service_times }}
+                        </div>
+                    </div>
+
+                    <h6 class="mt-4 mb-3 border-bottom pb-2">Social Media Links</h6>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label"><i class="fa-brands fa-facebook me-1 text-primary"></i>Facebook</label>
+                            {{ form.facebook }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label"><i class="fa-brands fa-twitter me-1 text-info"></i>Twitter</label>
+                            {{ form.twitter }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label"><i class="fa-brands fa-instagram me-1 text-danger"></i>Instagram</label>
+                            {{ form.instagram }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label"><i class="fa-brands fa-youtube me-1 text-danger"></i>YouTube</label>
+                            {{ form.youtube }}
+                        </div>
+                    </div>
+
+                    <h6 class="mt-4 mb-3 border-bottom pb-2">Twilio WhatsApp Settings</h6>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Account SID</label>
+                            {{ form.twilio_account_sid }}
+                            <small class="text-muted">From Twilio Console → Account → API Credentials</small>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Auth Token</label>
+                            {{ form.twilio_auth_token }}
+                            <small class="text-muted">Keep this confidential</small>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">WhatsApp Sender Number</label>
+                            {{ form.twilio_whatsapp_from }}
+                            <small class="text-muted">Twilio WhatsApp-enabled number e.g. +14155238886</small>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 d-flex gap-2">
+                        <button type="submit" class="btn btn-accent">
+                            <i class="fa-solid fa-save me-1"></i>Save Changes
+                        </button>
+                        <a href="{% url 'church_info' %}" class="btn btn-outline-secondary">
+                            <i class="fa-solid fa-times me-1"></i>Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

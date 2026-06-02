@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Notice Board - Grace Community Church{% endblock %}
+
+{% block page_title %}Notice Board{% endblock %}
+
+{% block breadcrumb_items %}
+<li class="breadcrumb-item active" aria-current="page">Notice Board</li>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="mb-0"><i class="fa-solid fa-bullhorn me-2"></i>Notice Board</h2>
+    <div>
+        <a href="{% url 'notices:notice_pdf' %}" class="btn btn-outline-secondary me-2">
+            <i class="fa-solid fa-file-pdf me-1"></i>Download PDF
+        </a>
+        {% if user.profile.role == 'admin' %}
+        <a href="{% url 'notices:notice_create' %}" class="btn btn-accent">
+            <i class="fa-solid fa-plus me-1"></i>Post Notice
+        </a>
+        {% endif %}
+    </div>
+</div>
+
+{% if notices %}
+<div class="row">
+    {% for notice in notices %}
+    <div class="col-12 mb-3">
+        <div class="card {% if notice.is_pinned %}border-warning{% endif %}">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div class="flex-grow-1">
+                        <div class="d-flex align-items-center mb-2">
+                            {% if notice.is_pinned %}
+                            <span class="text-warning me-2" title="Pinned">
+                                <i class="fa-solid fa-thumbtack"></i>
+                            </span>
+                            {% endif %}
+                            <h5 class="card-title mb-0">
+                                <a href="{% url 'notices:notice_detail' notice.pk %}" class="text-decoration-none">
+                                    {{ notice.title }}
+                                </a>
+                            </h5>
+                        </div>
+                        <p class="card-text text-muted">{{ notice.content|truncatewords:40 }}</p>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-between align-items-center mt-3">
+                    <div class="d-flex flex-wrap gap-2 align-items-center">
+                        <span class="badge {% if notice.category == 'urgent' %}bg-danger{% elif notice.category == 'event' %}bg-success{% elif notice.category == 'announcement' %}bg-info{% elif notice.category == 'thanks' %}bg-warning text-dark{% else %}bg-secondary{% endif %}">
+                            {{ notice.get_category_display }}
+                        </span>
+                        <small class="text-muted">
+                            <i class="fa-regular fa-calendar me-1"></i>{{ notice.created_at|date:"M d, Y" }}
+                        </small>
+                        <small class="text-muted">
+                            <i class="fa-regular fa-user me-1"></i>{{ notice.posted_by }}
+                        </small>
+                    </div>
+                    <a href="{% url 'notices:notice_detail' notice.pk %}" class="btn btn-sm btn-outline-primary">
+                        Read More <i class="fa-solid fa-arrow-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+{% if is_paginated %}
+<nav aria-label="Page navigation" class="mt-4">
+    <ul class="pagination justify-content-center">
+        {% if page_obj.has_previous %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.previous_page_number }}"><i class="fa-solid fa-chevron-left"></i></a>
+        </li>
+        {% endif %}
+        {% for num in page_obj.paginator.page_range %}
+        <li class="page-item {% if page_obj.number == num %}active{% endif %}">
+            <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+        </li>
+        {% endfor %}
+        {% if page_obj.has_next %}
+        <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.next_page_number }}"><i class="fa-solid fa-chevron-right"></i></a>
+        </li>
+        {% endif %}
+    </ul>
+</nav>
+{% endif %}
+
+{% else %}
+<div class="text-center py-5">
+    <i class="fa-regular fa-rectangle-list fa-4x text-muted mb-3"></i>
+    <h5 class="text-muted">No notices yet</h5>
+    {% if user.profile.role == 'admin' %}
+    <a href="{% url 'notices:notice_create' %}" class="btn btn-accent mt-2">Post the First Notice</a>
+    {% endif %}
+</div>
+{% endif %}
+{% endblock %}

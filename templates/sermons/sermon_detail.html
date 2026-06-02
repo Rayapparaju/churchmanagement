@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ sermon.title }} - Grace Community Church{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 mb-0">{{ sermon.title }}</h1>
+    <div>
+        <a href="{% url 'sermons:sermon_list' %}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-1"></i> Back to Sermons
+        </a>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-8">
+        <div class="card shadow-sm mb-4">
+            <div class="card-body">
+                <h5 class="card-title d-flex align-items-center gap-2">
+                    {{ sermon.speaker }}
+                    {% if sermon.is_published %}
+                        <span class="badge bg-success">Published</span>
+                    {% else %}
+                        <span class="badge bg-warning text-dark">Unpublished</span>
+                    {% endif %}
+                </h5>
+                <p class="text-muted mb-3">
+                    <i class="fas fa-calendar-alt me-1"></i> {{ sermon.date|date:'F d, Y' }}
+                    {% if sermon.bible_verse %}
+                        &nbsp;|&nbsp; <i class="fas fa-book me-1"></i> {{ sermon.bible_verse }}
+                    {% endif %}
+                    {% if sermon.series %}
+                        &nbsp;|&nbsp; <i class="fas fa-list me-1"></i> {{ sermon.series }}
+                    {% endif %}
+                </p>
+
+                {% if sermon.description %}
+                    <hr>
+                    <h6>Description</h6>
+                    <p class="mb-0">{{ sermon.description|linebreaksbr }}</p>
+                {% endif %}
+
+                {% if sermon.notes %}
+                    <hr>
+                    <h6>Notes</h6>
+                    <div class="p-3 bg-light rounded">
+                        {{ sermon.notes|linebreaksbr }}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-4">
+        {% if sermon.audio_file or sermon.document or sermon.video_link %}
+            <div class="card shadow-sm mb-4">
+                <div class="card-header fw-semibold">Media & Resources</div>
+                <div class="list-group list-group-flush">
+                    {% if sermon.audio_file %}
+                        <div class="list-group-item">
+                            <div class="fw-medium mb-1"><i class="fas fa-headphones me-1"></i> Audio</div>
+                            <audio controls class="w-100" style="height:40px;">
+                                <source src="{{ sermon.audio_file.url }}" type="audio/mpeg">
+                            </audio>
+                            <a href="{{ sermon.audio_file.url }}" class="small" download>Download</a>
+                        </div>
+                    {% endif %}
+                    {% if sermon.document %}
+                        <div class="list-group-item">
+                            <i class="fas fa-file-alt me-1"></i> Document
+                            <a href="{{ sermon.document.url }}" class="btn btn-sm btn-outline-accent float-end" download>
+                                <i class="fas fa-download me-1"></i> Download
+                            </a>
+                        </div>
+                    {% endif %}
+                    {% if sermon.video_link %}
+                        <div class="list-group-item">
+                            <i class="fas fa-video me-1"></i> Video
+                            <a href="{{ sermon.video_link }}" target="_blank" class="btn btn-sm btn-outline-primary float-end">
+                                <i class="fas fa-external-link-alt me-1"></i> Watch
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        {% endif %}
+
+        <div class="card shadow-sm">
+            <div class="card-header fw-semibold">Actions</div>
+            <div class="card-body d-flex flex-column gap-2">
+                <a href="{% url 'sermons:sermon_update' sermon.pk %}" class="btn btn-outline-secondary">
+                    <i class="fas fa-edit me-1"></i> Edit
+                </a>
+                <a href="{% url 'sermons:sermon_delete' sermon.pk %}" class="btn btn-outline-danger">
+                    <i class="fas fa-trash me-1"></i> Delete
+                </a>
+                <a href="{% url 'sermons:sermon_pdf' sermon.pk %}" class="btn btn-outline-accent">
+                    <i class="fas fa-file-pdf me-1"></i> Download Sermon Notes PDF
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

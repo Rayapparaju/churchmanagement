@@ -1,0 +1,216 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Member ID Card</title>
+<style>
+@page {
+  margin: 0;
+  size: 53.98mm 85.6mm;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #222; }
+
+.card {
+  width: 53.98mm;
+  height: 85.6mm;
+  background: linear-gradient(145deg, #ffffff 0%, #f8f9fc 100%);
+  border: 2px solid #1a1a2e;
+  border-radius: 8px;
+  padding: 3mm 3.5mm;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(90deg, #e94560 0%, #0f3460 100%);
+}
+
+.top {
+  text-align: center;
+  width: 100%;
+  padding-bottom: 1mm;
+  border-bottom: 1px solid #e0e0e0;
+  margin-bottom: 2mm;
+}
+.top .church-name {
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  color: #1a1a2e;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  hyphens: auto;
+  line-height: 1.15;
+}
+.top .church-sub {
+  font-size: 4.5px;
+  color: #999;
+  margin-top: 0.5px;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  line-height: 1.15;
+}
+
+.mid {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  flex: 1;
+  justify-content: center;
+  gap: 1.5mm;
+}
+
+.photo-box {
+  width: 26mm;
+  height: 34mm;
+  border: 1.5px solid #1a1a2e;
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 5px;
+  color: #bbb;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  flex-shrink: 0;
+}
+.photo-box img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.info { text-align: center; }
+.info .member-id {
+  font-size: 6px;
+  color: #888;
+  letter-spacing: 0.6px;
+  font-weight: 600;
+}
+.info .member-name {
+  font-size: 9.5px;
+  font-weight: 700;
+  color: #1a1a2e;
+  line-height: 1.2;
+  margin-top: 0.5px;
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+.info .detail-row {
+  margin-top: 1.5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  flex-wrap: wrap;
+}
+
+.voter-badge {
+  display: inline-block;
+  background: linear-gradient(135deg, #0d6efd, #17a2b8);
+  color: #fff;
+  padding: 0.5px 6px;
+  border-radius: 8px;
+  font-size: 5.5px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+}
+.nonvoter-badge {
+  display: inline-block;
+  background: linear-gradient(135deg, #adb5bd, #6c757d);
+  color: #fff;
+  padding: 0.5px 6px;
+  border-radius: 8px;
+  font-size: 5.5px;
+  font-weight: 600;
+}
+.voter-id-text { font-size: 5px; color: #777; font-weight: 500; }
+.dob-text { font-size: 5.5px; color: #666; }
+
+.qr-placeholder {
+  font-size: 5px;
+  color: #bbb;
+  border: 1px dashed #ccc;
+  border-radius: 2px;
+  padding: 0.5px 4px;
+  display: inline-block;
+  text-align: center;
+  letter-spacing: 0.2px;
+}
+
+.bottom {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  font-size: 4.5px;
+  color: #aaa;
+  border-top: 1px solid #e0e0e0;
+  padding-top: 1.5mm;
+  margin-top: 1.5mm;
+  flex-shrink: 0;
+}
+.bottom .label { color: #bbb; }
+
+.active-strip {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, #e94560, #0f3460, #1a1a2e);
+}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="top">
+    <div class="church-name">{{ church_info.name|default:"Grace Community Church" }}</div>
+    <div class="church-sub">{{ church_info.address|default:"123 Faith Avenue, Hope City" }}</div>
+  </div>
+  <div class="mid">
+    <div class="photo-box">
+      {% if photo_path %}<img src="{{ photo_path }}" alt="Photo">{% else %}No Photo{% endif %}
+    </div>
+    <div class="info">
+      <div class="member-id">{{ member.membership_id }}</div>
+      <div class="member-name">{{ member.full_name }}</div>
+      <div class="detail-row">
+        {% if member.is_voter %}
+        <span class="voter-badge">VOTER</span>
+        {% else %}
+        <span class="nonvoter-badge">NON-VOTER</span>
+        {% endif %}
+        {% if member.is_voter and member.voter_id %}
+        <span class="voter-id-text">ID: {{ member.voter_id }}</span>
+        {% endif %}
+      </div>
+      <div class="detail-row">
+        {% if member.date_of_birth %}
+        <span class="dob-text">DOB: {{ member.date_of_birth|date:"d M Y" }}</span>
+        {% endif %}
+        <span class="qr-placeholder">&#9835; QR</span>
+      </div>
+    </div>
+  </div>
+  <div class="bottom">
+    <span><span class="label">Valid:</span> {{ valid_until }}</span>
+    <span><span class="label">gcc.org/</span>{{ member.membership_id }}</span>
+  </div>
+  <div class="active-strip"></div>
+</div>
+</body>
+</html>

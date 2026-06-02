@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+{% if prayer_request %}Update Prayer Request{% else %}Submit Prayer Request{% endif %} - Grace Community Church
+{% endblock %}
+
+{% block page_title %}
+{% if prayer_request %}Update Prayer Request{% else %}Submit Prayer Request{% endif %}
+{% endblock %}
+
+{% block breadcrumb_items %}
+<li class="breadcrumb-item"><a href="{% url 'prayers:prayer_list' %}">Prayer Requests</a></li>
+<li class="breadcrumb-item active" aria-current="page">
+    {% if prayer_request %}Update{% else %}Submit{% endif %}
+</li>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-0">
+    <div class="row justify-content-center">
+        <div class="col-lg-8 col-xl-6">
+            <div class="card">
+                <div class="card-body p-4 p-md-5">
+                    <div class="text-center mb-4">
+                        <i class="fa-solid fa-hands-praying fa-3x text-accent mb-3"></i>
+                        <h4 class="fw-bold">{% if prayer_request %}Update Prayer Request{% else %}Share Your Prayer Request{% endif %}</h4>
+                        <p class="text-muted">
+                            {% if prayer_request %}
+                            Update the status or add notes to this prayer request.
+                            {% else %}
+                            We believe in the power of prayer. Share your request with our church community.
+                            {% endif %}
+                        </p>
+                    </div>
+
+                    <form method="post" class="needs-validation" novalidate>
+                        {% csrf_token %}
+
+                        {% if form.non_field_errors %}
+                        <div class="alert alert-danger">
+                            {% for error in form.non_field_errors %}
+                            {{ error }}
+                            {% endfor %}
+                        </div>
+                        {% endif %}
+
+                        {% if prayer_request %}
+                        {% for field in form %}
+                        <div class="mb-3">
+                            <label for="{{ field.id_for_label }}" class="form-label fw-medium">
+                                {{ field.label }}
+                            </label>
+                            {{ field }}
+                            {% if field.help_text %}
+                            <div class="form-text text-muted small">{{ field.help_text }}</div>
+                            {% endif %}
+                            {% for error in field.errors %}
+                            <div class="invalid-feedback d-block">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+                        {% endfor %}
+
+                        {% else %}
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="{{ form.name.id_for_label }}" class="form-label fw-medium">Your Name <span class="text-danger">*</span></label>
+                                {{ form.name }}
+                                {% for error in form.name.errors %}
+                                <div class="invalid-feedback d-block">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                            <div class="col-md-6">
+                                <label for="{{ form.email.id_for_label }}" class="form-label fw-medium">Email</label>
+                                {{ form.email }}
+                                {% for error in form.email.errors %}
+                                <div class="invalid-feedback d-block">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                            <div class="col-md-6">
+                                <label for="{{ form.phone.id_for_label }}" class="form-label fw-medium">Phone</label>
+                                {{ form.phone }}
+                                {% for error in form.phone.errors %}
+                                <div class="invalid-feedback d-block">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                        </div>
+
+                        <div class="mb-3 mt-3">
+                            <label for="{{ form.request.id_for_label }}" class="form-label fw-medium">Prayer Request <span class="text-danger">*</span></label>
+                            {{ form.request }}
+                            {% for error in form.request.errors %}
+                            <div class="invalid-feedback d-block">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="mb-4">
+                            <div class="form-check">
+                                {{ form.is_private }}
+                                <label class="form-check-label fw-medium" for="{{ form.is_private.id_for_label }}">
+                                    <i class="fa-solid fa-lock text-muted me-1"></i> Keep this request private
+                                </label>
+                                <div class="form-text text-muted small ms-1">Only church leadership will see your request.</div>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-accent flex-grow-1">
+                                <i class="fa-solid fa-paper-plane me-2"></i>
+                                {% if prayer_request %}Update Request{% else %}Submit Prayer Request{% endif %}
+                            </button>
+                            <a href="{% url 'prayers:prayer_list' %}" class="btn btn-outline-secondary">Cancel</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

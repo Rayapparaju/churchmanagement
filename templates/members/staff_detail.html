@@ -1,0 +1,175 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ staff.full_name }} - Staff Profile{% endblock %}
+
+{% block page_title %}Staff Profile{% endblock %}
+
+{% block breadcrumb_items %}
+<li class="breadcrumb-item"><a href="{% url 'members:staff_list' %}">Staff</a></li>
+<li class="breadcrumb-item active" aria-current="page">{{ staff.full_name }}</li>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-4 mb-4">
+        <div class="card">
+            <div class="card-body text-center">
+                {% if staff.photo %}
+                <img src="{{ staff.photo.url }}" alt="{{ staff.full_name }}"
+                     class="rounded-circle img-thumbnail mb-3" style="width: 160px; height: 160px; object-fit: cover;">
+                {% else %}
+                <div class="rounded-circle bg-secondary text-white d-inline-flex align-items-center justify-content-center img-thumbnail mb-3"
+                     style="width: 160px; height: 160px;">
+                    <i class="fa-solid fa-user-tie fa-4x"></i>
+                </div>
+                {% endif %}
+                <h4 class="mb-1">{{ staff.full_name }}</h4>
+                <p class="text-muted mb-2"><code>{{ staff.staff_id }}</code></p>
+                <div class="mb-2">
+                    <span class="badge bg-info fs-6">{{ staff.get_role_display }}</span>
+                </div>
+                <div class="mb-3">
+                    {% if staff.is_active %}
+                    <span class="badge bg-success">Active</span>
+                    {% else %}
+                    <span class="badge bg-secondary">Inactive</span>
+                    {% endif %}
+                </div>
+                <div class="d-grid gap-2">
+                    <a href="{% url 'members:staff_update' staff.pk %}" class="btn btn-accent">
+                        <i class="fa-solid fa-edit me-1"></i>Edit Profile
+                    </a>
+                    <a href="{% url 'members:staff_pdf' staff.pk %}" class="btn btn-outline-secondary" target="_blank">
+                        <i class="fa-solid fa-file-pdf me-1"></i>Download PDF
+                    </a>
+                    {% if user.profile.role == 'admin' %}
+                    <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal"
+                            data-delete-url="{% url 'members:staff_delete' staff.pk %}"
+                            data-item-name="{{ staff.full_name }} ({{ staff.staff_id }})">
+                        <i class="fa-solid fa-trash me-1"></i>Delete
+                    </button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-8">
+        <div class="row">
+            <div class="col-md-6 mb-4">
+                <div class="card h-100">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0"><i class="fa-solid fa-user me-2"></i>Personal Information</h5>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-sm table-borderless mb-0">
+                            <tr>
+                                <td class="text-muted" style="width: 120px;">Full Name</td>
+                                <td>{{ staff.full_name }}</td>
+                            </tr>
+                            <tr>
+                                <td class="text-muted">Staff ID</td>
+                                <td><code>{{ staff.staff_id }}</code></td>
+                            </tr>
+                            <tr>
+                                <td class="text-muted">Role</td>
+                                <td><span class="badge bg-info">{{ staff.get_role_display }}</span></td>
+                            </tr>
+                            <tr>
+                                <td class="text-muted">Ministry</td>
+                                <td>
+                                    {% if staff.ministry %}
+                                    {{ staff.ministry.name }}
+                                    {% else %}
+                                    <span class="text-muted">&mdash;</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="text-muted">Joined</td>
+                                <td>{{ staff.joined_date|date:"F j, Y" }}</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 mb-4">
+                <div class="card h-100">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0"><i class="fa-solid fa-address-book me-2"></i>Contact</h5>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-sm table-borderless mb-0">
+                            <tr>
+                                <td class="text-muted" style="width: 100px;">Phone</td>
+                                <td>
+                                    <a href="tel:{{ staff.phone }}" class="text-decoration-none">{{ staff.phone }}</a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="text-muted">Email</td>
+                                <td>
+                                    <a href="mailto:{{ staff.email }}" class="text-decoration-none">{{ staff.email }}</a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="text-muted">Address</td>
+                                <td>{{ staff.address|linebreaksbr }}</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            {% if staff.notes %}
+            <div class="col-12 mb-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0"><i class="fa-solid fa-pencil me-2"></i>Notes</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="mb-0">{{ staff.notes|linebreaksbr }}</p>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var deleteModal = document.getElementById('confirmDeleteModal');
+    if (deleteModal) {
+        deleteModal.addEventListener('show.bs.modal', function(event) {
+            var button = event.relatedTarget;
+            var deleteUrl = button.getAttribute('data-delete-url');
+            var itemName = button.getAttribute('data-item-name');
+            var modalBody = deleteModal.querySelector('.modal-body p');
+            var confirmBtn = deleteModal.querySelector('.btn-confirm-delete');
+            if (modalBody) {
+                modalBody.textContent = 'Are you sure you want to delete ' + itemName + '? This action cannot be undone.';
+            }
+            if (confirmBtn) {
+                confirmBtn.onclick = function() {
+                    var form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = deleteUrl;
+                    var csrf = document.createElement('input');
+                    csrf.type = 'hidden';
+                    csrf.name = 'csrfmiddlewaretoken';
+                    csrf.value = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+                    form.appendChild(csrf);
+                    document.body.appendChild(form);
+                    form.submit();
+                };
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

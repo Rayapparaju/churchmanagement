@@ -1,0 +1,65 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Ministry Members List</title>
+<style>
+@page {
+  margin: 15mm;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: Helvetica, Arial, sans-serif; font-size: 11px; color: #000; line-height: 1.4; }
+.container { max-width: 850px; margin: 0 auto; }
+.header { text-align: center; padding-bottom: 10px; border-bottom: 2px solid #000; margin-bottom: 20px; }
+.header h1 { font-size: 20px; }
+.header p { font-size: 11px; }
+.ministry-name { text-align: center; font-size: 18px; font-weight: bold; margin: 5px 0; }
+.title { text-align: center; font-size: 14px; font-weight: bold; margin-bottom: 20px; letter-spacing: 1px; font-style: italic; }
+table.data { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+table.data th { border: 1px solid #000; padding: 7px 8px; background-color: #eee; font-size: 10px; font-weight: bold; text-align: center; }
+table.data td { border: 1px solid #000; padding: 5px 8px; font-size: 10px; }
+table.data th:nth-child(1) { width: 6%; }
+table.data th:nth-child(2) { width: 25%; }
+table.data th:nth-child(3) { width: 20%; }
+table.data th:nth-child(4) { width: 30%; }
+table.data th:nth-child(5) { width: 19%; }
+.total-count { text-align: right; font-weight: bold; font-size: 11px; padding: 5px; border-top: 1px solid #000; margin-top: 5px; }
+.footer { text-align: center; font-size: 10px; color: #555; border-top: 1px solid #000; padding-top: 8px; margin-top: 30px; }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1>Grace Community Church</h1>
+    <p>123 Faith Avenue, Hope City, HC 10001 | (555) 123-4567 | info@gcc.org</p>
+  </div>
+  <div class="ministry-name">{{ ministry.name }}</div>
+  <div class="title">MEMBERS LIST</div>
+  <table class="data">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Name</th>
+        <th>Phone</th>
+        <th>Email</th>
+        <th>Joined Date</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for m in members %}
+      <tr>
+        <td style="text-align:center;">{{ forloop.counter }}</td>
+        <td>{{ m.full_name }}</td>
+        <td>{{ m.phone }}</td>
+        <td>{{ m.email }}</td>
+        <td>{{ m.joining_date|date:"F j, Y" }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <div class="total-count">Total Members: <strong>{{ members|length }}</strong></div>
+  <div class="footer">Generated on: {{ generated_date }}</div>
+</div>
+</body>
+</html>

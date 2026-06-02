@@ -1,0 +1,403 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ member.full_name }} - Member Profile{% endblock %}
+
+{% block page_title %}Member Profile{% endblock %}
+
+{% block breadcrumb_items %}
+<li class="breadcrumb-item"><a href="{% url 'members:member_list' %}">Members</a></li>
+<li class="breadcrumb-item active" aria-current="page">{{ member.full_name }}</li>
+{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-4 mb-4">
+        <div class="card">
+            <div class="card-body text-center">
+                {% if member.photo %}
+                <img src="{{ member.photo.url }}" alt="{{ member.full_name }}"
+                     class="rounded-circle img-thumbnail mb-3" style="width: 160px; height: 160px; object-fit: cover;">
+                {% else %}
+                <div class="rounded-circle bg-secondary text-white d-inline-flex align-items-center justify-content-center img-thumbnail mb-3"
+                     style="width: 160px; height: 160px;">
+                    <i class="fa-solid fa-user fa-4x"></i>
+                </div>
+                {% endif %}
+                <h4 class="mb-1">{{ member.full_name }}</h4>
+                <p class="text-muted mb-2"><code>{{ member.membership_id }}</code></p>
+                <div class="mb-3">
+                    {% if member.is_active %}
+                    <span class="badge bg-success fs-6">Active</span>
+                    {% else %}
+                    <span class="badge bg-secondary fs-6">Inactive</span>
+                    {% endif %}
+                </div>
+                <div class="d-grid gap-2">
+                    <a href="{% url 'members:member_update' member.pk %}" class="btn btn-accent">
+                        <i class="fa-solid fa-edit me-1"></i>Edit Profile
+                    </a>
+                    <a href="{% url 'members:member_pdf' member.pk %}" class="btn btn-outline-secondary" target="_blank">
+                        <i class="fa-solid fa-file-pdf me-1"></i>Profile PDF
+                    </a>
+                    {% if user.profile.role == 'admin' %}
+                    <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal"
+                            data-delete-url="{% url 'members:member_delete' member.pk %}"
+                            data-item-name="{{ member.full_name }} ({{ member.membership_id }})">
+                        <i class="fa-solid fa-trash me-1"></i>Delete
+                    </button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-8">
+        <div class="row">
+            <div class="col-md-6 mb-4">
+                <div class="card h-100">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0"><i class="fa-solid fa-user me-2"></i>Personal Information</h5>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-sm table-borderless mb-0">
+                            <tr>
+                                <td class="text-muted" style="width: 120px;">Gender</td>
+                                <td>{{ member.get_gender_display }}</td>
+                            </tr>
+                            <tr>
+                                <td class="text-muted">Date of Birth</td>
+                                <td>{{ member.date_of_birth|date:"F j, Y" }}</td>
+                            </tr>
+                            <tr>
+                                <td class="text-muted">Age</td>
+                                <td>{{ member.date_of_birth|timesince|cut:","|cut:" "|slice:":-3" }} years</td>
+                            </tr>
+                            <tr>
+                                <td class="text-muted">Occupation</td>
+                                <td>{{ member.occupation|default:"&mdash;" }}</td>
+                            </tr>
+                            <tr>
+                                <td class="text-muted">Marital Status</td>
+                                <td>{{ member.get_marital_status_display }}</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 mb-4">
+                <div class="card h-100">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0"><i class="fa-solid fa-address-book me-2"></i>Contact</h5>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-sm table-borderless mb-0">
+                            <tr>
+                                <td class="text-muted" style="width: 100px;">Phone</td>
+                                <td>
+                                    <a href="tel:{{ member.phone }}" class="text-decoration-none">{{ member.phone }}</a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="text-muted">Email</td>
+                                <td>
+                                    {% if member.email %}
+                                    <a href="mailto:{{ member.email }}" class="text-decoration-none">{{ member.email }}</a>
+                                    {% else %}
+                                    <span class="text-muted">&mdash;</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="text-muted">Address</td>
+                                <td>{{ member.address|linebreaksbr }}</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 mb-4">
+                <div class="card h-100">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0"><i class="fa-solid fa-church me-2"></i>Church Info</h5>
+                        <a href="{% url 'members:baptism_certificate_create' member.pk %}" class="btn btn-sm btn-accent">
+                            <i class="fa-solid fa-cross me-1"></i>Certificate
+                        </a>
+                    </div>
+                    <div class="card-body">
+                        <table class="table table-sm table-borderless mb-0">
+                            <tr>
+                                <td class="text-muted" style="width: 130px;">Baptism Status</td>
+                                <td>{{ member.get_baptism_status_display }}</td>
+                            </tr>
+                            <tr>
+                                <td class="text-muted">Baptism Date</td>
+                                <td>{{ member.baptism_date|date:"F j, Y"|default:"&mdash;" }}</td>
+                            </tr>
+                            <tr>
+                                <td class="text-muted">Joined</td>
+                                <td>{{ member.joining_date|date:"F j, Y" }}</td>
+                            </tr>
+                            <tr>
+                                <td class="text-muted">Voter Status</td>
+                                <td>
+                                    {% if member.is_voter %}
+                                    <span class="badge bg-info">Registered Voter</span>
+                                    {% else %}
+                                    <span class="badge bg-secondary">Non-Voter</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% if member.is_voter and member.voter_id %}
+                            <tr>
+                                <td class="text-muted">Voter ID</td>
+                                <td><code>{{ member.voter_id }}</code></td>
+                            </tr>
+                            {% endif %}
+                            <tr>
+                                <td class="text-muted">Family Head</td>
+                                <td>
+                                    {% if member.family_head %}
+                                    <a href="{% url 'members:member_detail' member.family_head.pk %}" class="text-decoration-none">
+                                        {{ member.family_head.full_name }}
+                                    </a>
+                                    {% else %}
+                                    <span class="text-muted">&mdash;</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 mb-4">
+                <div class="card h-100">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0"><i class="fa-solid fa-phone-alt me-2"></i>Emergency Contact</h5>
+                    </div>
+                    <div class="card-body">
+                        {% if member.emergency_contact_name %}
+                        <table class="table table-sm table-borderless mb-0">
+                            <tr>
+                                <td class="text-muted" style="width: 100px;">Name</td>
+                                <td>{{ member.emergency_contact_name }}</td>
+                            </tr>
+                            <tr>
+                                <td class="text-muted">Phone</td>
+                                <td>
+                                    <a href="tel:{{ member.emergency_contact_phone }}" class="text-decoration-none">{{ member.emergency_contact_phone }}</a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="text-muted">Relation</td>
+                                <td>{{ member.emergency_contact_relation }}</td>
+                            </tr>
+                        </table>
+                        {% else %}
+                        <p class="text-muted mb-0">No emergency contact on record.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            {% if member.notes %}
+            <div class="col-12 mb-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="card-title mb-0"><i class="fa-solid fa-pencil me-2"></i>Notes</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="mb-0">{{ member.notes|linebreaksbr }}</p>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <div class="col-12 mb-4">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0"><i class="fa-solid fa-cross me-2"></i>Baptism Certificates</h5>
+                        <a href="{% url 'members:baptism_certificate_create' member.pk %}" class="btn btn-sm btn-accent">
+                            <i class="fa-solid fa-plus me-1"></i>Issue New
+                        </a>
+                    </div>
+                    <div class="card-body">
+                        {% with cert_list=member.baptism_certificates.all %}
+                        <div class="table-responsive">
+                            <table class="table table-sm table-hover mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Certificate #</th>
+                                        <th>Baptism Date</th>
+                                        <th>Type</th>
+                                        <th>Officiated By</th>
+                                        <th>Issued</th>
+                                        <th class="text-end">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for cert in cert_list|dictsortreversed:"baptism_date" %}
+                                    <tr>
+                                        <td><code>{{ cert.certificate_number }}</code></td>
+                                        <td>{{ cert.baptism_date|date:"d M Y" }}</td>
+                                        <td><span class="badge bg-secondary">{{ cert.get_baptism_type_display }}</span></td>
+                                        <td>{{ cert.officiated_by|default:"&mdash;" }}</td>
+                                        <td>{{ cert.date_issued|date:"d M Y" }}</td>
+                                        <td class="text-end">
+                                            <a href="{% url 'members:baptism_certificate_pdf' cert.pk %}" class="btn btn-sm btn-outline-success" target="_blank" title="Download PDF">
+                                                <i class="fa-solid fa-file-pdf"></i>
+                                            </a>
+                                            {% if user.profile.role == 'admin' %}
+                                            <button type="button" class="btn btn-sm btn-outline-danger" title="Delete"
+                                                    data-bs-toggle="modal" data-bs-target="#confirmDeleteModal"
+                                                    data-delete-url="{% url 'members:baptism_certificate_delete' cert.pk %}"
+                                                    data-item-name="Certificate {{ cert.certificate_number }} for {{ member.full_name }}">
+                                                <i class="fa-solid fa-trash"></i>
+                                            </button>
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr>
+                                        <td colspan="6" class="text-center py-4 text-muted">
+                                            <i class="fa-solid fa-cross fa-2x d-block mb-2"></i>
+                                            No baptism certificate issued yet.
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% endwith %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-12 mb-4">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="card-title mb-0"><i class="fa-solid fa-hand-holding-heart me-2"></i>Offerings</h5>
+                        <a href="{% url 'offerings:create' %}?member={{ member.pk }}" class="btn btn-sm btn-accent">
+                            <i class="fa-solid fa-plus me-1"></i>Add Offering
+                        </a>
+                    </div>
+                    <div class="card-body">
+                        {% with offering_list=member.offerings.all %}
+                        <div class="table-responsive">
+                            <table class="table table-sm table-hover mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Receipt</th>
+                                        <th>Date</th>
+                                        <th>Type</th>
+                                        <th>Amount</th>
+                                        <th>Payment</th>
+                                        <th class="text-end">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for offering in offering_list|dictsortreversed:"date"|slice:":10" %}
+                                    <tr>
+                                        <td><code>{{ offering.receipt_number }}</code></td>
+                                        <td>{{ offering.date|date:"d M Y" }}</td>
+                                        <td><span class="badge bg-secondary">{{ offering.get_offering_type_display }}</span></td>
+                                        <td class="fw-bold">₹{{ offering.amount }}</td>
+                                        <td>{{ offering.get_payment_method_display }}</td>
+                                        <td class="text-end">
+                                            <a href="{% url 'offerings:detail' offering.pk %}" class="btn btn-sm btn-outline-primary" title="View">
+                                                <i class="fa-solid fa-eye"></i>
+                                            </a>
+                                            <a href="{% url 'offerings:receipt' offering.pk %}" class="btn btn-sm btn-outline-success" target="_blank" title="Receipt PDF">
+                                                <i class="fa-solid fa-file-pdf"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% empty %}
+                                    <tr>
+                                        <td colspan="6" class="text-center py-4 text-muted">
+                                            <i class="fa-solid fa-inbox fa-2x d-block mb-2"></i>
+                                            No offerings recorded for this member.
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="text-center mt-2">
+                            <a href="{% url 'offerings:list' %}?member={{ member.pk }}" class="btn btn-sm btn-outline-secondary">
+                                <i class="fa-solid fa-list me-1"></i>View All Offerings
+                            </a>
+                        </div>
+                        {% endwith %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-3">
+            <div class="col-12">
+                <div class="d-flex gap-2">
+                    {% if user.profile.role == 'admin' %}
+                    <a href="{% url 'members:member_update' member.pk %}" class="btn btn-primary">
+                        <i class="fa-solid fa-edit me-1"></i>Edit
+                    </a>
+                    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal"
+                            data-delete-url="{% url 'members:member_delete' member.pk %}"
+                            data-item-name="{{ member.full_name }} ({{ member.membership_id }})">
+                        <i class="fa-solid fa-trash me-1"></i>Delete
+                    </button>
+                    {% endif %}
+                    <a href="{% url 'members:member_pdf' member.pk %}" class="btn btn-success" target="_blank">
+                        <i class="fa-solid fa-download me-1"></i>Download Profile PDF
+                    </a>
+                    <a href="{% url 'members:member_id_card' member.pk %}" class="btn btn-info text-white" target="_blank">
+                        <i class="fa-solid fa-id-card me-1"></i>Download ID Card
+                    </a>
+                    {% if member.baptism_status != 'none' and member.baptism_certificates.exists %}
+                    <a href="{% url 'members:baptism_certificate_pdf' member.baptism_certificates.first.pk %}" class="btn btn-warning text-white" target="_blank">
+                        <i class="fa-solid fa-cross me-1"></i>Baptism Certificate
+                    </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var deleteModal = document.getElementById('confirmDeleteModal');
+    if (deleteModal) {
+        deleteModal.addEventListener('show.bs.modal', function(event) {
+            var button = event.relatedTarget;
+            var deleteUrl = button.getAttribute('data-delete-url');
+            var itemName = button.getAttribute('data-item-name');
+            var modalBody = deleteModal.querySelector('.modal-body p');
+            var confirmBtn = deleteModal.querySelector('.btn-confirm-delete');
+            if (modalBody) {
+                modalBody.textContent = 'Are you sure you want to delete ' + itemName + '? This action cannot be undone.';
+            }
+            if (confirmBtn) {
+                confirmBtn.onclick = function() {
+                    var form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = deleteUrl;
+                    var csrf = document.createElement('input');
+                    csrf.type = 'hidden';
+                    csrf.name = 'csrfmiddlewaretoken';
+                    csrf.value = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+                    form.appendChild(csrf);
+                    document.body.appendChild(form);
+                    form.submit();
+                };
+            }
+        });
+    }
+});
+</script>
+{% endblock %}

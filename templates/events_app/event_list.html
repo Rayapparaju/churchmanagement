@@ -1,0 +1,175 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Church Events{% endblock %}
+
+{% block page_title %}Church Events{% endblock %}
+
+{% block breadcrumb_items %}
+<li class="breadcrumb-item active" aria-current="page">Events</li>
+{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-5">
+        <form method="GET" action="{% url 'events_app:event_list' %}" class="d-flex">
+            <div class="input-group">
+                <input type="text" name="q" class="form-control" placeholder="Search by title..." value="{{ search_query }}">
+                <button class="btn btn-accent" type="submit">
+                    <i class="fa-solid fa-search"></i>
+                </button>
+                {% if search_query %}
+                <a href="{% url 'events_app:event_list' %}" class="btn btn-outline-secondary">
+                    <i class="fa-solid fa-times"></i>
+                </a>
+                {% endif %}
+            </div>
+        </form>
+    </div>
+    <div class="col-md-7 text-md-end mt-2 mt-md-0">
+        <div class="btn-group me-2">
+            <a href="{% url 'events_app:event_list' %}?status=upcoming" class="btn btn-outline-secondary btn-sm {% if status_filter == 'upcoming' %}active{% endif %}">Upcoming</a>
+            <a href="{% url 'events_app:event_list' %}?status=ongoing" class="btn btn-outline-secondary btn-sm {% if status_filter == 'ongoing' %}active{% endif %}">Ongoing</a>
+            <a href="{% url 'events_app:event_list' %}?status=completed" class="btn btn-outline-secondary btn-sm {% if status_filter == 'completed' %}active{% endif %}">Completed</a>
+            <a href="{% url 'events_app:event_list' %}?status=cancelled" class="btn btn-outline-secondary btn-sm {% if status_filter == 'cancelled' %}active{% endif %}">Cancelled</a>
+            {% if status_filter %}
+            <a href="{% url 'events_app:event_list' %}" class="btn btn-outline-secondary btn-sm">All</a>
+            {% endif %}
+        </div>
+        <a href="{% url 'events_app:event_create' %}" class="btn btn-accent">
+            <i class="fa-solid fa-plus me-1"></i>Create Event
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    {% for event in events %}
+    <div class="col-lg-4 col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <h5 class="card-title mb-0">
+                        <a href="{% url 'events_app:event_detail' event.pk %}" class="text-decoration-none">
+                            {{ event.title }}
+                        </a>
+                    </h5>
+                    {% if event.status == 'upcoming' %}
+                    <span class="badge bg-primary">Upcoming</span>
+                    {% elif event.status == 'ongoing' %}
+                    <span class="badge bg-success">Ongoing</span>
+                    {% elif event.status == 'completed' %}
+                    <span class="badge bg-secondary">Completed</span>
+                    {% elif event.status == 'cancelled' %}
+                    <span class="badge bg-danger">Cancelled</span>
+                    {% endif %}
+                </div>
+                <p class="card-text text-muted small mb-3">
+                    {% if event.description %}
+                    {{ event.description|truncatewords:25 }}
+                    {% else %}
+                    <span class="fst-italic">No description</span>
+                    {% endif %}
+                </p>
+                <ul class="list-unstyled mb-0 small">
+                    <li class="mb-1">
+                        <i class="fa-solid fa-calendar-day text-accent me-2"></i>{{ event.date|date:"F j, Y" }}
+                    </li>
+                    <li class="mb-1">
+                        <i class="fa-solid fa-clock text-accent me-2"></i>{{ event.time|time:"g:i A" }}
+                        {% if event.end_time %} &ndash; {{ event.end_time|time:"g:i A" }}{% endif %}
+                    </li>
+                    {% if event.location %}
+                    <li class="mb-1">
+                        <i class="fa-solid fa-location-dot text-accent me-2"></i>{{ event.location }}
+                    </li>
+                    {% endif %}
+                    {% if event.organizer %}
+                    <li>
+                        <i class="fa-solid fa-user text-accent me-2"></i>{{ event.organizer }}
+                    </li>
+                    {% endif %}
+                </ul>
+            </div>
+            <div class="card-footer bg-transparent">
+                <div class="d-flex justify-content-between">
+                    <a href="{% url 'events_app:event_detail' event.pk %}" class="btn btn-sm btn-outline-primary" title="View">
+                        <i class="fa-solid fa-eye"></i>
+                    </a>
+                    <a href="{% url 'events_app:event_update' event.pk %}" class="btn btn-sm btn-outline-secondary" title="Edit">
+                        <i class="fa-solid fa-edit"></i>
+                    </a>
+                    <button type="button" class="btn btn-sm btn-outline-danger" title="Delete"
+                            data-bs-toggle="modal" data-bs-target="#confirmDeleteModal"
+                            data-delete-url="{% url 'events_app:event_delete' event.pk %}"
+                            data-item-name="{{ event.title }}">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                    <a href="{% url 'events_app:event_pdf' event.pk %}" class="btn btn-sm btn-outline-info" title="Download PDF">
+                        <i class="fa-solid fa-file-pdf"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body text-center py-5">
+                <i class="fa-solid fa-calendar fa-3x text-muted mb-3"></i>
+                <p class="text-muted mb-0">
+                    {% if search_query %}
+                    No events found matching "{{ search_query }}".
+                    {% else %}
+                    No events scheduled yet.
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+{% if is_paginated %}
+<div class="card mt-3">
+    <div class="card-footer">
+        <nav>
+            <ul class="pagination justify-content-center mb-0">
+                {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page=1{% if search_query %}&q={{ search_query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}">
+                        <i class="fa-solid fa-angle-double-left"></i>
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}">
+                        <i class="fa-solid fa-angle-left"></i>
+                    </a>
+                </li>
+                {% endif %}
+                {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ num }}{% if search_query %}&q={{ search_query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}">{{ num }}</a>
+                </li>
+                {% endif %}
+                {% endfor %}
+                {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}">
+                        <i class="fa-solid fa-angle-right"></i>
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if search_query %}&q={{ search_query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}">
+                        <i class="fa-solid fa-angle-double-right"></i>
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

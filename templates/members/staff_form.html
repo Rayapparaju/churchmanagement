@@ -1,0 +1,211 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{% if object %}Edit Staff{% else %}Add Staff{% endif %}{% endblock %}
+
+{% block page_title %}{% if object %}Edit Staff{% else %}Add Staff{% endif %}{% endblock %}
+
+{% block breadcrumb_items %}
+<li class="breadcrumb-item"><a href="{% url 'members:staff_list' %}">Staff</a></li>
+<li class="breadcrumb-item active" aria-current="page">{% if object %}Edit{% else %}Add{% endif %}</li>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        <form method="POST" enctype="multipart/form-data" novalidate>
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+            <div class="alert alert-danger">
+                {% for error in form.non_field_errors %}
+                <p class="mb-0">{{ error }}</p>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <div class="row">
+                <div class="col-md-4 mb-4">
+                    <div class="card">
+                        <div class="card-body text-center">
+                            <div class="mb-3">
+                                {% if object and object.photo %}
+                                <img src="{{ object.photo.url }}" alt="{{ object.full_name }}"
+                                     class="rounded-circle img-thumbnail" style="width: 150px; height: 150px; object-fit: cover;">
+                                {% else %}
+                                <div class="rounded-circle bg-secondary text-white d-inline-flex align-items-center justify-content-center img-thumbnail"
+                                     style="width: 150px; height: 150px;">
+                                    <i class="fa-solid fa-user-tie fa-4x"></i>
+                                </div>
+                                {% endif %}
+                            </div>
+                            <h5 class="mb-1">{% if object %}{{ object.full_name }}{% else %}New Staff{% endif %}</h5>
+                            {% if object %}
+                            <p class="text-muted small mb-3">{{ object.staff_id }}</p>
+                            {% endif %}
+                            <div class="mb-3">
+                                <label for="{{ form.photo.id_for_label }}" class="form-label small">Upload Photo</label>
+                                {{ form.photo }}
+                                {% if form.photo.errors %}
+                                <div class="text-danger small mt-1">{{ form.photo.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="form-check form-switch">
+                                {{ form.is_active }}
+                                <label class="form-check-label" for="{{ form.is_active.id_for_label }}">Active Staff</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card mt-4">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0"><i class="fa-solid fa-user-plus me-2"></i>User Account</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="form-check mb-3">
+                                {{ form.create_user }}
+                                <label class="form-check-label" for="{{ form.create_user.id_for_label }}">
+                                    Create User Account
+                                </label>
+                            </div>
+                            <div id="userAccountFields" style="display: none;">
+                                <div class="mb-3">
+                                    <label for="{{ form.username.id_for_label }}" class="form-label">Username <span class="text-danger">*</span></label>
+                                    {{ form.username }}
+                                    {% if form.username.errors %}
+                                    <div class="text-danger small mt-1">{{ form.username.errors }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="mb-3">
+                                    <label for="{{ form.password.id_for_label }}" class="form-label">Password <span class="text-danger">*</span></label>
+                                    {{ form.password }}
+                                    {% if form.password.errors %}
+                                    <div class="text-danger small mt-1">{{ form.password.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            {% if object and object.user %}
+                            <p class="text-muted small mb-0">
+                                <i class="fa-solid fa-link me-1"></i>Linked to user: <strong>{{ object.user.username }}</strong>
+                            </p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-8">
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0"><i class="fa-solid fa-user me-2"></i>Personal Information</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="{{ form.first_name.id_for_label }}" class="form-label">First Name <span class="text-danger">*</span></label>
+                                    {{ form.first_name }}
+                                    {% if form.first_name.errors %}
+                                    <div class="text-danger small mt-1">{{ form.first_name.errors }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="{{ form.last_name.id_for_label }}" class="form-label">Last Name <span class="text-danger">*</span></label>
+                                    {{ form.last_name }}
+                                    {% if form.last_name.errors %}
+                                    <div class="text-danger small mt-1">{{ form.last_name.errors }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="{{ form.role.id_for_label }}" class="form-label">Role <span class="text-danger">*</span></label>
+                                    {{ form.role }}
+                                    {% if form.role.errors %}
+                                    <div class="text-danger small mt-1">{{ form.role.errors }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="{{ form.ministry.id_for_label }}" class="form-label">Assigned Ministry</label>
+                                    {{ form.ministry }}
+                                    {% if form.ministry.errors %}
+                                    <div class="text-danger small mt-1">{{ form.ministry.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0"><i class="fa-solid fa-address-book me-2"></i>Contact Information</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="{{ form.phone.id_for_label }}" class="form-label">Phone <span class="text-danger">*</span></label>
+                                    {{ form.phone }}
+                                    {% if form.phone.errors %}
+                                    <div class="text-danger small mt-1">{{ form.phone.errors }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="{{ form.email.id_for_label }}" class="form-label">Email <span class="text-danger">*</span></label>
+                                    {{ form.email }}
+                                    {% if form.email.errors %}
+                                    <div class="text-danger small mt-1">{{ form.email.errors }}</div>
+                                    {% endif %}
+                                </div>
+                                <div class="col-12">
+                                    <label for="{{ form.address.id_for_label }}" class="form-label">Address <span class="text-danger">*</span></label>
+                                    {{ form.address }}
+                                    {% if form.address.errors %}
+                                    <div class="text-danger small mt-1">{{ form.address.errors }}</div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card mb-4">
+                        <div class="card-header">
+                            <h5 class="card-title mb-0"><i class="fa-solid fa-pencil me-2"></i>Notes</h5>
+                        </div>
+                        <div class="card-body">
+                            {{ form.notes }}
+                            {% if form.notes.errors %}
+                            <div class="text-danger small mt-1">{{ form.notes.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-between mb-4">
+                        <a href="{% url 'members:staff_list' %}" class="btn btn-outline-secondary">
+                            <i class="fa-solid fa-arrow-left me-1"></i>Cancel
+                        </a>
+                        <button type="submit" class="btn btn-accent">
+                            <i class="fa-solid fa-save me-1"></i>{% if object %}Update Staff{% else %}Save Staff{% endif %}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var createUserCheckbox = document.getElementById('{{ form.create_user.id_for_label }}');
+    var userAccountFields = document.getElementById('userAccountFields');
+    if (createUserCheckbox && userAccountFields) {
+        function toggleUserFields() {
+            userAccountFields.style.display = createUserCheckbox.checked ? 'block' : 'none';
+            var inputs = userAccountFields.querySelectorAll('input');
+            inputs.forEach(function(input) {
+                input.disabled = !createUserCheckbox.checked;
+            });
+        }
+        createUserCheckbox.addEventListener('change', toggleUserFields);
+        toggleUserFields();
+    }
+});
+</script>
+{% endblock %}

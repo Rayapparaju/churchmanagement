@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+    @page {
+        size: A4 portrait;
+        margin: 0;
+    }
+    @page landscape {
+        size: A4 landscape;
+        margin: 20mm 25mm;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+        font-family: 'Times New Roman', Times, serif;
+        color: #1a1a2e;
+        font-size: 12pt;
+        line-height: 1.5;
+    }
+
+    .certificate-wrapper {
+        width: 297mm;
+        height: 210mm;
+        position: relative;
+        page: landscape;
+        overflow: hidden;
+    }
+
+    /* Outer ornate border */
+    .outer-border {
+        position: absolute;
+        top: 8mm;
+        left: 10mm;
+        right: 10mm;
+        bottom: 8mm;
+        border: 3px solid #c9a84c;
+        border-radius: 8px;
+        pointer-events: none;
+    }
+
+    .inner-border {
+        position: absolute;
+        top: 12mm;
+        left: 14mm;
+        right: 14mm;
+        bottom: 12mm;
+        border: 1.5px solid #c9a84c;
+        border-radius: 5px;
+        pointer-events: none;
+    }
+
+    /* Corner decorations */
+    .corner {
+        position: absolute;
+        font-size: 28pt;
+        color: #c9a84c;
+        pointer-events: none;
+    }
+    .corner-tl { top: 5mm; left: 7mm; }
+    .corner-tr { top: 5mm; right: 7mm; }
+    .corner-bl { bottom: 5mm; left: 7mm; }
+    .corner-br { bottom: 5mm; right: 7mm; }
+
+    .content {
+        position: absolute;
+        top: 16mm;
+        left: 18mm;
+        right: 18mm;
+        bottom: 16mm;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        text-align: center;
+    }
+
+    /* Gold gradient bar at top */
+    .gold-bar {
+        width: 80%;
+        height: 4px;
+        background: linear-gradient(to right, transparent, #c9a84c, #d4af37, #c9a84c, transparent);
+        margin-bottom: 8mm;
+        border: none;
+    }
+
+    .church-name {
+        font-size: 20pt;
+        font-weight: bold;
+        color: #1a1a2e;
+        letter-spacing: 2px;
+        text-transform: uppercase;
+        margin-bottom: 2mm;
+    }
+
+    .church-address {
+        font-size: 9pt;
+        color: #555;
+        margin-bottom: 4mm;
+    }
+
+    .certificate-title {
+        font-size: 26pt;
+        font-weight: bold;
+        color: #c9a84c;
+        text-transform: uppercase;
+        letter-spacing: 4px;
+        margin: 6mm 0 2mm 0;
+        font-family: 'Times New Roman', Times, serif;
+    }
+
+    .certificate-subtitle {
+        font-size: 11pt;
+        color: #666;
+        font-style: italic;
+        margin-bottom: 6mm;
+    }
+
+    .gold-bar-bottom {
+        width: 60%;
+        height: 2px;
+        background: linear-gradient(to right, transparent, #c9a84c, #d4af37, #c9a84c, transparent);
+        margin-bottom: 6mm;
+        border: none;
+    }
+
+    .know-ye {
+        font-size: 11pt;
+        color: #444;
+        margin-bottom: 4mm;
+        font-style: italic;
+    }
+
+    .certificate-name {
+        font-size: 28pt;
+        font-weight: bold;
+        color: #1a1a2e;
+        text-transform: uppercase;
+        letter-spacing: 3px;
+        margin: 3mm 0;
+        border-bottom: 2px solid #c9a84c;
+        padding-bottom: 2mm;
+        display: inline-block;
+    }
+
+    .certificate-text {
+        font-size: 11pt;
+        color: #444;
+        margin: 3mm 0;
+        max-width: 80%;
+    }
+
+    .certificate-text strong {
+        color: #1a1a2e;
+    }
+
+    .baptism-type-display {
+        font-size: 14pt;
+        font-weight: bold;
+        color: #c9a84c;
+        margin: 2mm 0;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+    }
+
+    /* Details row */
+    .details-row {
+        width: 80%;
+        display: flex;
+        justify-content: space-between;
+        margin: 5mm 0;
+        padding: 3mm 0;
+        border-top: 1px solid #ddd;
+        border-bottom: 1px solid #ddd;
+    }
+
+    .detail-item {
+        text-align: center;
+        flex: 1;
+    }
+
+    .detail-label {
+        font-size: 8pt;
+        text-transform: uppercase;
+        color: #999;
+        letter-spacing: 1px;
+        margin-bottom: 1mm;
+    }
+
+    .detail-value {
+        font-size: 11pt;
+        color: #1a1a2e;
+        font-weight: bold;
+    }
+
+    /* Scripture */
+    .scripture {
+        font-size: 10pt;
+        font-style: italic;
+        color: #666;
+        margin: 4mm 0;
+        max-width: 75%;
+    }
+
+    .scripture-ref {
+        font-size: 9pt;
+        color: #888;
+        margin-top: 1mm;
+    }
+
+    /* Signature area */
+    .signature-area {
+        width: 80%;
+        display: flex;
+        justify-content: space-between;
+        margin-top: 6mm;
+        padding-top: 3mm;
+    }
+
+    .signature-line {
+        text-align: center;
+        flex: 1;
+        margin: 0 5mm;
+    }
+
+    .signature-line .line {
+        width: 100%;
+        border-top: 1.5px solid #1a1a2e;
+        margin-bottom: 2mm;
+        height: 10mm;
+    }
+
+    .signature-label {
+        font-size: 9pt;
+        color: #555;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+    }
+
+    .signature-name {
+        font-size: 10pt;
+        font-weight: bold;
+        color: #1a1a2e;
+    }
+
+    /* Footer */
+    .footer {
+        position: absolute;
+        bottom: 10mm;
+        left: 18mm;
+        right: 18mm;
+        text-align: center;
+        font-size: 7.5pt;
+        color: #aaa;
+    }
+
+    .footer span {
+        padding: 0 3mm;
+    }
+
+    .footer .cert-number {
+        float: left;
+    }
+
+    .footer .gen-date {
+        float: right;
+    }
+</style>
+</head>
+<body>
+<div class="certificate-wrapper">
+    <div class="outer-border"></div>
+    <div class="inner-border"></div>
+
+    <div class="corner corner-tl">&#10086;</div>
+    <div class="corner corner-tr">&#10086;</div>
+    <div class="corner corner-bl">&#10086;</div>
+    <div class="corner corner-br">&#10086;</div>
+
+    <div class="content">
+
+        <div class="gold-bar"></div>
+
+        <div class="church-name">{{ church_info.name|default:"Grace Community Church" }}</div>
+        {% if church_info.address %}
+        <div class="church-address">{{ church_info.address }}{% if church_info.city %}, {{ church_info.city }}{% endif %}{% if church_info.state %} {{ church_info.state }}{% endif %} - {{ church_info.zipcode }}</div>
+        {% endif %}
+
+        <div class="certificate-title">Certificate of Baptism</div>
+        <div class="certificate-subtitle">"Go therefore and make disciples of all nations, baptizing them..."</div>
+
+        <div class="gold-bar-bottom"></div>
+
+        <div class="know-ye">This is to certify that</div>
+
+        <div class="certificate-name">{{ certificate.member.full_name }}</div>
+
+        {% if certificate.baptism_type != 'none' %}
+        <div class="certificate-text">
+            was faithfully administered the Sacrament of
+        </div>
+        <div class="baptism-type-display">
+            {% if certificate.baptism_type == 'water' %}Water Baptism
+            {% elif certificate.baptism_type == 'holy_spirit' %}Holy Spirit Baptism
+            {% elif certificate.baptism_type == 'both' %}Water and Holy Spirit Baptism
+            {% endif %}
+        </div>
+        {% endif %}
+
+        <div class="details-row">
+            <div class="detail-item">
+                <div class="detail-label">Date of Baptism</div>
+                <div class="detail-value">{{ certificate.baptism_date|date:"F d, Y" }}</div>
+            </div>
+            {% if certificate.officiated_by %}
+            <div class="detail-item">
+                <div class="detail-label">Officiated By</div>
+                <div class="detail-value">{{ certificate.officiated_by }}</div>
+            </div>
+            {% endif %}
+            <div class="detail-item">
+                <div class="detail-label">Certificate No.</div>
+                <div class="detail-value">{{ certificate.certificate_number }}</div>
+            </div>
+        </div>
+
+        <div class="scripture">
+            "Therefore, if anyone is in Christ, the new creation has come: The old has gone, the new is here!"
+            <div class="scripture-ref">&mdash; 2 Corinthians 5:17</div>
+        </div>
+
+        <div class="signature-area">
+            <div class="signature-line">
+                <div class="line"></div>
+                <div class="signature-label">Pastor</div>
+                <div class="signature-name">{{ church_info.pastor_name|default:"Senior Pastor" }}</div>
+            </div>
+            <div class="signature-line">
+                <div class="line"></div>
+                <div class="signature-label">Date Issued</div>
+                <div class="signature-name">{{ certificate.date_issued|date:"F d, Y" }}</div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <span class="cert-number">Cert. #{{ certificate.certificate_number }}</span>
+            <span>|</span>
+            <span>{{ church_info.name|default:"Grace Community Church" }}</span>
+            <span>|</span>
+            <span class="gen-date">Generated: {{ generated_date }}</span>
+        </div>
+
+    </div>
+</div>
+</body>
+</html>

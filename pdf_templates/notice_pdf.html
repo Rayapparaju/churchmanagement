@@ -1,0 +1,52 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Notice Board</title>
+<style>
+@page {
+  margin: 15mm;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: Helvetica, Arial, sans-serif; font-size: 12px; color: #000; line-height: 1.5; }
+.container { max-width: 800px; margin: 0 auto; }
+.header { text-align: center; padding-bottom: 10px; border-bottom: 2px solid #000; margin-bottom: 20px; }
+.header h1 { font-size: 20px; }
+.header p { font-size: 11px; }
+.title { text-align: center; font-size: 16px; font-weight: bold; letter-spacing: 1px; margin-bottom: 5px; }
+.gen-date { text-align: center; font-size: 10px; color: #555; margin-bottom: 25px; }
+.notice { margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px solid #ccc; }
+.notice:last-child { border-bottom: none; margin-bottom: 0; }
+.notice .notice-title { font-size: 15px; font-weight: bold; margin-bottom: 3px; }
+.notice .notice-meta { font-size: 10px; color: #555; margin-bottom: 8px; }
+.notice .notice-category { display: inline-block; font-size: 9px; border: 1px solid #000; padding: 1px 6px; margin-right: 5px; }
+.notice .notice-content { white-space: pre-wrap; margin-bottom: 6px; }
+.notice .notice-footer { font-size: 10px; color: #666; font-style: italic; }
+.separator { border: none; border-top: 1px dashed #999; margin: 15px 0; }
+.footer { text-align: center; font-size: 10px; color: #555; border-top: 1px solid #000; padding-top: 8px; margin-top: 30px; }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1>Grace Community Church</h1>
+    <p>123 Faith Avenue, Hope City, HC 10001 | (555) 123-4567 | info@gcc.org</p>
+  </div>
+  <div class="title">NOTICE BOARD</div>
+  <div class="gen-date">Generated on: {{ generated_date }}</div>
+  {% for n in notices %}
+  <div class="notice">
+    <div class="notice-title">{{ n.title }}</div>
+    <div class="notice-meta">
+      <span class="notice-category">{{ n.get_category_display }}</span>
+      <span>{{ n.posted_by }} — {{ n.created_at|date:"F j, Y" }}</span>
+    </div>
+    <div class="notice-content">{{ n.content }}</div>
+  </div>
+  {% if not forloop.last %}<hr class="separator">{% endif %}
+  {% endfor %}
+  <div class="footer">Notice Board — Grace Community Church</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Delete Member{% endblock %}
+
+{% block page_title %}Delete Member{% endblock %}
+
+{% block breadcrumb_items %}
+<li class="breadcrumb-item"><a href="{% url 'members:member_list' %}">Members</a></li>
+<li class="breadcrumb-item"><a href="{% url 'members:member_detail' member.pk %}">{{ member.full_name }}</a></li>
+<li class="breadcrumb-item active" aria-current="page">Delete</li>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="card border-danger">
+            <div class="card-header bg-danger text-white">
+                <h5 class="card-title mb-0"><i class="fa-solid fa-exclamation-triangle me-2"></i>Confirm Deletion</h5>
+            </div>
+            <div class="card-body text-center py-5">
+                <i class="fa-solid fa-user-slash fa-4x text-danger mb-4"></i>
+                <h4 class="mb-2">Are you sure?</h4>
+                <p class="text-muted mb-4">
+                    You are about to delete <strong>{{ member.full_name }}</strong>
+                    (<code>{{ member.membership_id }}</code>).
+                </p>
+                <div class="alert alert-warning">
+                    <i class="fa-solid fa-info-circle me-1"></i>
+                    This action cannot be undone. All data associated with this member will be permanently removed.
+                </div>
+            </div>
+            <div class="card-footer d-flex justify-content-between">
+                <a href="{% url 'members:member_detail' member.pk %}" class="btn btn-outline-secondary">
+                    <i class="fa-solid fa-arrow-left me-1"></i>Cancel
+                </a>
+                <form method="POST">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">
+                        <i class="fa-solid fa-trash me-1"></i>Confirm Delete
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

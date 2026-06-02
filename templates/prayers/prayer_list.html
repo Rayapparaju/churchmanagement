@@ -1,0 +1,142 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Prayer Requests - Grace Community Church{% endblock %}
+
+{% block page_title %}Prayer Requests{% endblock %}
+
+{% block breadcrumb_items %}
+<li class="breadcrumb-item active" aria-current="page">Prayer Requests</li>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-0">
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+        <div>
+            <a href="{% url 'prayers:prayer_create' %}" class="btn btn-accent">
+                <i class="fa-solid fa-hands-praying me-2"></i>Submit Prayer Request
+            </a>
+        </div>
+        {% if user.profile.role in 'admin,pastor' %}
+        <div>
+            <a href="{% url 'prayers:prayer_pdf' %}" class="btn btn-outline-secondary" target="_blank">
+                <i class="fa-solid fa-download me-2"></i>Download PDF Report
+            </a>
+        </div>
+        {% endif %}
+    </div>
+
+    {% if user.profile.role in 'admin,pastor' %}
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3 align-items-end">
+                <div class="col-auto">
+                    <label for="statusFilter" class="form-label small fw-semibold text-muted">Filter by Status</label>
+                    <select name="status" id="statusFilter" class="form-select" onchange="this.form.submit()">
+                        <option value="">All</option>
+                        <option value="pending" {% if request.GET.status == 'pending' %}selected{% endif %}>Pending</option>
+                        <option value="prayed" {% if request.GET.status == 'prayed' %}selected{% endif %}>Prayed For</option>
+                        <option value="answered" {% if request.GET.status == 'answered' %}selected{% endif %}>Answered</option>
+                        <option value="closed" {% if request.GET.status == 'closed' %}selected{% endif %}>Closed</option>
+                    </select>
+                </div>
+                {% if request.GET.status %}
+                <div class="col-auto">
+                    <a href="{% url 'prayers:prayer_list' %}" class="btn btn-outline-secondary">Clear</a>
+                </div>
+                {% endif %}
+            </form>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="card">
+        <div class="card-body p-0">
+            {% if prayer_requests %}
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="ps-4">Name</th>
+                            <th>Request</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                            <th class="text-end pe-4">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for pr in prayer_requests %}
+                        <tr>
+                            <td class="ps-4 fw-medium">{{ pr.name }}</td>
+                            <td>{{ pr.request|truncatewords:20 }}</td>
+                            <td class="text-nowrap">{{ pr.created_at|date:"M d, Y" }}</td>
+                            <td>
+                                {% if pr.status == 'pending' %}
+                                <span class="badge bg-warning text-dark">Pending</span>
+                                {% elif pr.status == 'prayed' %}
+                                <span class="badge bg-info">Prayed For</span>
+                                {% elif pr.status == 'answered' %}
+                                <span class="badge bg-success">Answered</span>
+                                {% elif pr.status == 'closed' %}
+                                <span class="badge bg-secondary">Closed</span>
+                                {% endif %}
+                            </td>
+                            <td class="text-end pe-4">
+                                <a href="{% url 'prayers:prayer_detail' pr.pk %}" class="btn btn-sm btn-outline-primary me-1" title="View">
+                                    <i class="fa-solid fa-eye"></i>
+                                </a>
+                                {% if user.profile.role in 'admin,pastor' %}
+                                <a href="{% url 'prayers:prayer_update' pr.pk %}" class="btn btn-sm btn-outline-accent" title="Update Status">
+                                    <i class="fa-solid fa-pen-to-square"></i>
+                                </a>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            {% if is_paginated %}
+            <div class="d-flex justify-content-center py-3">
+                <nav>
+                    <ul class="pagination pagination-sm mb-0">
+                        {% if page_obj.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?{% if request.GET.status %}status={{ request.GET.status }}&{% endif %}page=1">&laquo;&laquo;</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?{% if request.GET.status %}status={{ request.GET.status }}&{% endif %}page={{ page_obj.previous_page_number }}">&laquo;</a>
+                        </li>
+                        {% endif %}
+
+                        <li class="page-item active">
+                            <span class="page-link">{{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+                        </li>
+
+                        {% if page_obj.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?{% if request.GET.status %}status={{ request.GET.status }}&{% endif %}page={{ page_obj.next_page_number }}">&raquo;</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?{% if request.GET.status %}status={{ request.GET.status }}&{% endif %}page={{ page_obj.paginator.num_pages }}">&raquo;&raquo;</a>
+                        </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+            {% endif %}
+
+            {% else %}
+            <div class="text-center py-5">
+                <i class="fa-solid fa-hands-praying fa-3x text-muted mb-3"></i>
+                <p class="text-muted mb-0">No prayer requests found.</p>
+                <a href="{% url 'prayers:prayer_create' %}" class="btn btn-accent mt-3">
+                    <i class="fa-solid fa-plus me-2"></i>Submit Your Prayer Request
+                </a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

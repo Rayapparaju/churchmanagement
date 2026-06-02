@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Record Offering{% endblock %}
+
+{% block page_title %}Record Offering{% endblock %}
+
+{% block breadcrumb_items %}
+<li class="breadcrumb-item"><a href="{% url 'offerings:list' %}">Offerings</a></li>
+<li class="breadcrumb-item active" aria-current="page">Record</li>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <form method="POST" novalidate>
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+            <div class="alert alert-danger">
+                {% for error in form.non_field_errors %}
+                <p class="mb-0">{{ error }}</p>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0"><i class="fa-solid fa-hand-holding-heart me-2"></i>Offering Details</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label for="{{ form.member.id_for_label }}" class="form-label">Member</label>
+                            {{ form.member }}
+                            {% if form.member.errors %}
+                            <div class="text-danger small mt-1">{{ form.member.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label for="{{ form.offering_type.id_for_label }}" class="form-label">Offering Type <span class="text-danger">*</span></label>
+                            {{ form.offering_type }}
+                            {% if form.offering_type.errors %}
+                            <div class="text-danger small mt-1">{{ form.offering_type.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label for="{{ form.amount.id_for_label }}" class="form-label">Amount (₹) <span class="text-danger">*</span></label>
+                            {{ form.amount }}
+                            {% if form.amount.errors %}
+                            <div class="text-danger small mt-1">{{ form.amount.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label for="{{ form.date.id_for_label }}" class="form-label">Date <span class="text-danger">*</span></label>
+                            {{ form.date }}
+                            {% if form.date.errors %}
+                            <div class="text-danger small mt-1">{{ form.date.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-6">
+                            <label for="{{ form.payment_method.id_for_label }}" class="form-label">Payment Method <span class="text-danger">*</span></label>
+                            {{ form.payment_method }}
+                            {% if form.payment_method.errors %}
+                            <div class="text-danger small mt-1">{{ form.payment_method.errors }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="col-12">
+                            <label for="{{ form.notes.id_for_label }}" class="form-label">Notes</label>
+                            {{ form.notes }}
+                            {% if form.notes.errors %}
+                            <div class="text-danger small mt-1">{{ form.notes.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-between mb-4">
+                <a href="{% url 'offerings:list' %}" class="btn btn-outline-secondary">
+                    <i class="fa-solid fa-arrow-left me-1"></i>Cancel
+                </a>
+                <button type="submit" class="btn btn-accent">
+                    <i class="fa-solid fa-save me-1"></i>Record Offering
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var dateInput = document.getElementById('{{ form.date.id_for_label }}');
+    if (dateInput && !dateInput.value) {
+        var today = new Date().toISOString().split('T')[0];
+        dateInput.value = today;
+    }
+
+    var memberSelect = document.getElementById('{{ form.member.id_for_label }}');
+    if (memberSelect) {
+        memberSelect.setAttribute('data-searchable', 'true');
+    }
+});
+</script>
+{% endblock %}

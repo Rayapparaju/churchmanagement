@@ -1,0 +1,172 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Offerings & Tithes{% endblock %}
+
+{% block page_title %}Offerings & Tithes{% endblock %}
+
+{% block breadcrumb_items %}
+<li class="breadcrumb-item active" aria-current="page">Offerings</li>
+{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3">
+            <h4 class="mb-0">All Offerings</h4>
+            <a href="{% url 'offerings:create' %}" class="btn btn-accent">
+                <i class="fa-solid fa-plus me-1"></i>Record Offering
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-body">
+        <form method="GET" class="row g-3">
+            <div class="col-md-3">
+                <label for="offering_type" class="form-label">Offering Type</label>
+                <select name="offering_type" id="offering_type" class="form-select">
+                    <option value="">All Types</option>
+                    {% for val, label in offering_types %}
+                    <option value="{{ val }}" {% if offering_type == val %}selected{% endif %}>{{ label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-3">
+                <label for="date_from" class="form-label">Date From</label>
+                <input type="date" name="date_from" id="date_from" class="form-control" value="{{ date_from }}">
+            </div>
+            <div class="col-md-3">
+                <label for="date_to" class="form-label">Date To</label>
+                <input type="date" name="date_to" id="date_to" class="form-control" value="{{ date_to }}">
+            </div>
+            <div class="col-md-3">
+                <label for="member" class="form-label">Member</label>
+                <select name="member" id="member" class="form-select">
+                    <option value="">All Members</option>
+                    {% for m in members %}
+                    <option value="{{ m.pk }}" {% if member == m.pk|stringformat:'s' %}selected{% endif %}>{{ m.full_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-12">
+                <button type="submit" class="btn btn-accent">
+                    <i class="fa-solid fa-filter me-1"></i>Filter
+                </button>
+                <a href="{% url 'offerings:list' %}" class="btn btn-outline-secondary">
+                    <i class="fa-solid fa-undo me-1"></i>Reset
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Receipt #</th>
+                        <th>Date</th>
+                        <th>Member Name</th>
+                        <th>Type</th>
+                        <th class="text-end">Amount (₹)</th>
+                        <th>Payment Method</th>
+                        <th class="text-end" style="width: 120px;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for offering in offerings %}
+                    <tr>
+                        <td><code>{{ offering.receipt_number }}</code></td>
+                        <td>{{ offering.date|date:"M d, Y" }}</td>
+                        <td>
+                            {% if offering.member %}
+                            <a href="{% url 'offerings:detail' offering.pk %}" class="text-decoration-none fw-medium">
+                                {{ offering.member.full_name }}
+                            </a>
+                            {% else %}
+                            <span class="text-muted">&mdash;</span>
+                            {% endif %}
+                        </td>
+                        <td><span class="badge bg-info">{{ offering.get_offering_type_display }}</span></td>
+                        <td class="text-end fw-semibold">₹{{ offering.amount|floatformat:2 }}</td>
+                        <td>{{ offering.get_payment_method_display }}</td>
+                        <td>
+                            <div class="d-flex justify-content-end gap-1">
+                                <a href="{% url 'offerings:detail' offering.pk %}" class="btn btn-sm btn-outline-primary" title="View">
+                                    <i class="fa-solid fa-eye"></i>
+                                </a>
+                                {% if offering.member and offering.member.phone %}
+                                <a href="{{ offering.whatsapp_url }}" target="_blank" class="btn btn-sm btn-outline-success" title="Share via WhatsApp">
+                                    <i class="fa-brands fa-whatsapp"></i>
+                                </a>
+                                {% endif %}
+                                <a href="{% url 'offerings:receipt' offering.pk %}" class="btn btn-sm btn-outline-secondary" title="Receipt PDF">
+                                    <i class="fa-solid fa-file-pdf"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center py-5">
+                            <i class="fa-solid fa-hand-holding-heart fa-3x text-muted mb-3"></i>
+                            <p class="text-muted mb-0">No offerings found.</p>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="card-footer d-flex justify-content-between align-items-center">
+        <span class="text-muted">
+            <strong>Total:</strong> ₹{{ total_amount|floatformat:2 }}
+        </span>
+    </div>
+    {% if is_paginated %}
+    <div class="card-footer border-top-0">
+        <nav>
+            <ul class="pagination justify-content-center mb-0">
+                {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page=1{% for key, val in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ val }}{% endif %}{% endfor %}">
+                        <i class="fa-solid fa-angle-double-left"></i>
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% for key, val in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ val }}{% endif %}{% endfor %}">
+                        <i class="fa-solid fa-angle-left"></i>
+                    </a>
+                </li>
+                {% endif %}
+                {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ num }}{% for key, val in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ val }}{% endif %}{% endfor %}">{{ num }}</a>
+                </li>
+                {% endif %}
+                {% endfor %}
+                {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}{% for key, val in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ val }}{% endif %}{% endfor %}">
+                        <i class="fa-solid fa-angle-right"></i>
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% for key, val in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ val }}{% endif %}{% endfor %}">
+                        <i class="fa-solid fa-angle-double-right"></i>
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

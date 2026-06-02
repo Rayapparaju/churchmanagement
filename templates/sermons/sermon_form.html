@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{% if sermon %}Edit{% else %}Add{% endif %} Sermon - Grace Community Church{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 mb-0">{% if sermon %}Edit{% else %}Add{% endif %} Sermon</h1>
+    <a href="{% url 'sermons:sermon_list' %}" class="btn btn-outline-secondary">
+        <i class="fas fa-arrow-left me-1"></i> Back to Sermons
+    </a>
+</div>
+
+<div class="card shadow-sm">
+    <div class="card-body">
+        <form method="post" enctype="multipart/form-data" novalidate>
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+                <div class="alert alert-danger">
+                    {% for error in form.non_field_errors %}{{ error }}{% endfor %}
+                </div>
+            {% endif %}
+
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label for="{{ form.title.id_for_label }}" class="form-label">Title <span class="text-danger">*</span></label>
+                    {{ form.title }}
+                    {% for error in form.title.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                </div>
+                <div class="col-md-6">
+                    <label for="{{ form.speaker.id_for_label }}" class="form-label">Speaker <span class="text-danger">*</span></label>
+                    {{ form.speaker }}
+                    {% for error in form.speaker.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                </div>
+                <div class="col-md-4">
+                    <label for="{{ form.bible_verse.id_for_label }}" class="form-label">Bible Verse</label>
+                    {{ form.bible_verse }}
+                    {% for error in form.bible_verse.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                </div>
+                <div class="col-md-4">
+                    <label for="{{ form.date.id_for_label }}" class="form-label">Date <span class="text-danger">*</span></label>
+                    {{ form.date }}
+                    {% for error in form.date.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                </div>
+                <div class="col-md-4">
+                    <label for="{{ form.series.id_for_label }}" class="form-label">Series</label>
+                    {{ form.series }}
+                    {% for error in form.series.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                </div>
+                <div class="col-12">
+                    <label for="{{ form.description.id_for_label }}" class="form-label">Description</label>
+                    {{ form.description }}
+                    {% for error in form.description.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                </div>
+                <div class="col-12">
+                    <label for="{{ form.notes.id_for_label }}" class="form-label">Notes</label>
+                    {{ form.notes }}
+                    {% for error in form.notes.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                </div>
+                <div class="col-md-4">
+                    <label for="{{ form.audio_file.id_for_label }}" class="form-label">Audio File</label>
+                    {{ form.audio_file }}
+                    {% for error in form.audio_file.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                </div>
+                <div class="col-md-4">
+                    <label for="{{ form.document.id_for_label }}" class="form-label">Document</label>
+                    {{ form.document }}
+                    {% for error in form.document.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                </div>
+                <div class="col-md-4">
+                    <label for="{{ form.video_link.id_for_label }}" class="form-label">Video Link</label>
+                    {{ form.video_link }}
+                    {% for error in form.video_link.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                </div>
+                <div class="col-12">
+                    <div class="form-check">
+                        {{ form.is_published }}
+                        <label class="form-check-label" for="{{ form.is_published.id_for_label }}">Published</label>
+                    </div>
+                    {% for error in form.is_published.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                </div>
+            </div>
+
+            <div class="mt-4">
+                <button type="submit" class="btn btn-accent">
+                    <i class="fas fa-save me-1"></i> {% if sermon %}Update{% else %}Save{% endif %} Sermon
+                </button>
+                <a href="{% url 'sermons:sermon_list' %}" class="btn btn-outline-secondary ms-2">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

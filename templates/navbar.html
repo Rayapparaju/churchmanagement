@@ -1,0 +1,63 @@
+<nav class="top-navbar">
+    <div class="navbar-left">
+        <button class="sidebar-toggle" id="sidebarToggle" type="button" aria-label="Toggle sidebar">
+            <i class="fa-solid fa-bars"></i>
+        </button>
+        <div>
+            <h1 class="page-title">{% block page_title %}Dashboard{% endblock %}</h1>
+            {% block breadcrumb %}
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{% url 'dashboard' %}">Home</a></li>
+                    {% block breadcrumb_items %}{% endblock %}
+                </ol>
+            </nav>
+            {% endblock %}
+        </div>
+    </div>
+
+    <div class="navbar-right">
+        {% if user.profile.role in 'admin,pastor' %}
+        <button class="notification-btn" type="button" title="Pending Prayer Requests"
+                onclick="window.location.href='{% url 'prayers:prayer_list' %}'">
+            <i class="fa-regular fa-bell"></i>
+            <span class="badge" id="notificationBadge">{{ pending_prayer_count }}</span>
+        </button>
+        {% endif %}
+
+        <div class="dropdown user-dropdown">
+            <button class="dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <div class="avatar">
+                    {% if user.profile.photo %}
+                        <img src="{{ user.profile.photo.url }}" alt="{{ user.get_full_name }}">
+                    {% else %}
+                        <i class="fa-solid fa-user-circle"></i>
+                    {% endif %}
+                </div>
+                <span>{{ user.get_full_name|default:user.username }}</span>
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+                <li>
+                    <span class="dropdown-item-text text-muted small">
+                        <strong>{{ user.get_full_name|default:user.username }}</strong><br>
+                        <span class="text-capitalize">{{ user.profile.get_role_display }}</span>
+                    </span>
+                </li>
+                <li><hr class="dropdown-divider"></li>
+                {% if user.is_staff %}
+                <li>
+                    <a class="dropdown-item" href="{% url 'admin:index' %}">
+                        <i class="fa-solid fa-tachometer-alt fa-fw me-2"></i>Admin Panel
+                    </a>
+                </li>
+                {% endif %}
+                <li><hr class="dropdown-divider"></li>
+                <li>
+                    <a class="dropdown-item" href="{% url 'logout' %}">
+                        <i class="fa-solid fa-sign-out-alt fa-fw me-2"></i>Logout
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>

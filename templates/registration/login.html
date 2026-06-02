@@ -1,0 +1,218 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Login - Grace Community Church{% endblock %}
+
+{% block extra_head %}
+<style>
+    .login-page {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #2c3e50 0%, #34495e 50%, #2c3e50 100%);
+        padding: 1.5rem;
+    }
+
+    .login-card {
+        width: 100%;
+        max-width: 420px;
+        border: none;
+        border-radius: 16px;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        overflow: hidden;
+    }
+
+    .login-card .card-header {
+        background: #fff;
+        border-bottom: none;
+        padding: 2rem 2rem 0;
+        text-align: center;
+        display: block;
+    }
+
+    .login-card .card-body {
+        padding: 1.5rem 2rem 2rem;
+    }
+
+    .login-logo {
+        width: 72px;
+        height: 72px;
+        background: var(--accent-color);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1rem;
+    }
+
+    .login-logo i {
+        font-size: 2rem;
+        color: #fff;
+    }
+
+    .login-title {
+        font-size: 1.35rem;
+        font-weight: 700;
+        color: var(--primary-color);
+        margin-bottom: 0.25rem;
+    }
+
+    .login-subtitle {
+        font-size: 0.85rem;
+        color: #95a5a6;
+        margin-bottom: 0;
+    }
+
+    .login-card .form-control {
+        padding: 0.625rem 1rem;
+        font-size: 0.9rem;
+        border-radius: 10px;
+    }
+
+    .login-card .form-control:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(44,62,80,0.12);
+    }
+
+    .login-card .input-group-text {
+        background: #f8f9fa;
+        border: 1px solid #dce1e7;
+        border-right: none;
+        border-radius: 10px 0 0 10px;
+        color: #95a5a6;
+    }
+
+    .login-card .input-group .form-control {
+        border-left: none;
+        border-radius: 0 10px 10px 0;
+    }
+
+    .login-card .btn-login {
+        width: 100%;
+        padding: 0.7rem;
+        font-size: 0.95rem;
+        font-weight: 600;
+        border-radius: 10px;
+        background: var(--primary-color);
+        border-color: var(--primary-color);
+        color: #fff;
+        transition: all 0.2s ease;
+    }
+
+    .login-card .btn-login:hover {
+        background: #1a252f;
+        border-color: #1a252f;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(44,62,80,0.3);
+    }
+
+    .login-card .btn-login:active {
+        transform: translateY(0);
+    }
+
+    .login-card .form-check-label {
+        font-size: 0.85rem;
+        color: #7f8c8d;
+    }
+
+    .login-card .login-footer-text {
+        text-align: center;
+        font-size: 0.8rem;
+        color: #95a5a6;
+        margin-top: 1.5rem;
+    }
+
+    .login-card .alert {
+        border-radius: 10px;
+        font-size: 0.85rem;
+        padding: 0.625rem 1rem;
+    }
+
+    .login-card .form-label {
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: var(--secondary-color);
+    }
+</style>
+{% endblock %}
+
+{% block auth_content %}
+<div class="login-page">
+    <div class="login-card card">
+        <div class="card-header">
+            <div class="login-logo">
+                <i class="fa-solid fa-church"></i>
+            </div>
+            <h2 class="login-title">{{ church_info.name }}</h2>
+            <p class="login-subtitle">Church Management System</p>
+        </div>
+
+        <div class="card-body">
+            {% if form.errors %}
+                <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                    <i class="fa-solid fa-triangle-exclamation me-1"></i>
+                    Invalid username or password. Please try again.
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endif %}
+
+            {% if next %}
+                {% if user.is_authenticated %}
+                    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+                        <i class="fa-solid fa-triangle-exclamation me-1"></i>
+                        Your account doesn't have access to this page. Please login with an account that has access.
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endif %}
+            {% endif %}
+
+            <form method="post" action="{% url 'login' %}" class="needs-validation" novalidate>
+                {% csrf_token %}
+
+                <div class="mb-3">
+                    <label for="id_username" class="form-label">Username</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fa-solid fa-user"></i></span>
+                        <input type="text" name="username" id="id_username"
+                               class="form-control" placeholder="Enter your username"
+                               required autofocus autocomplete="username">
+                        <div class="invalid-feedback">Please enter your username.</div>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="id_password" class="form-label">Password</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="fa-solid fa-lock"></i></span>
+                        <input type="password" name="password" id="id_password"
+                               class="form-control" placeholder="Enter your password"
+                               required autocomplete="current-password">
+                        <div class="invalid-feedback">Please enter your password.</div>
+                    </div>
+                </div>
+
+                <div class="mb-3 form-check">
+                    <input type="checkbox" name="remember" id="id_remember" class="form-check-input">
+                    <label for="id_remember" class="form-check-label">Remember me</label>
+                </div>
+
+                <button type="submit" class="btn btn-login">
+                    <i class="fa-solid fa-sign-in-alt me-2"></i>Sign In
+                </button>
+
+                <input type="hidden" name="next" value="{{ next }}">
+            </form>
+
+            <div class="text-center mt-3">
+                <span class="text-muted" style="font-size: 0.85rem;">Don't have an account?</span>
+                <a href="{% url 'register' %}" class="btn btn-sm btn-outline-accent ms-2">Register</a>
+            </div>
+
+            <p class="login-footer-text">
+                &copy; {% now "Y" %} {{ church_info.name }}
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

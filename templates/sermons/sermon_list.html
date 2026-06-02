@@ -1,0 +1,129 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Sermons - Grace Community Church{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3 mb-0">Sermons</h1>
+    <a href="{% url 'sermons:sermon_create' %}" class="btn btn-accent">
+        <i class="fas fa-plus me-1"></i> Add Sermon
+    </a>
+</div>
+
+<div class="card shadow-sm mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-2 align-items-end">
+            <div class="col-md-5">
+                <label for="q" class="form-label visually-hidden">Search</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-search"></i></span>
+                    <input type="text" name="q" id="q" class="form-control" placeholder="Search by title, speaker, or verse..." value="{{ search_query }}">
+                </div>
+            </div>
+            <div class="col-md-3">
+                <label for="series" class="form-label visually-hidden">Series</label>
+                <select name="series" id="series" class="form-select">
+                    <option value="">All Series</option>
+                    {% for s in all_series %}
+                        <option value="{{ s }}" {% if current_series == s %}selected{% endif %}>{{ s }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100">Filter</button>
+            </div>
+            <div class="col-md-2">
+                <a href="{% url 'sermons:sermon_list' %}" class="btn btn-outline-secondary w-100">Reset</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card shadow-sm">
+    <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Title</th>
+                    <th>Speaker</th>
+                    <th>Bible Verse</th>
+                    <th>Date</th>
+                    <th>Series</th>
+                    <th>Status</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for sermon in sermons %}
+                    <tr>
+                        <td>
+                            <a href="{% url 'sermons:sermon_detail' sermon.pk %}" class="text-decoration-none fw-medium">
+                                {{ sermon.title }}
+                            </a>
+                        </td>
+                        <td>{{ sermon.speaker }}</td>
+                        <td>{{ sermon.bible_verse|default:'—' }}</td>
+                        <td>{{ sermon.date|date:'M d, Y' }}</td>
+                        <td>{{ sermon.series|default:'—' }}</td>
+                        <td>
+                            {% if sermon.is_published %}
+                                <span class="badge bg-success">Published</span>
+                            {% else %}
+                                <span class="badge bg-warning text-dark">Unpublished</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-end">
+                            <a href="{% url 'sermons:sermon_detail' sermon.pk %}" class="btn btn-sm btn-outline-primary" title="View">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            <a href="{% url 'sermons:sermon_update' sermon.pk %}" class="btn btn-sm btn-outline-secondary" title="Edit">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <a href="{% url 'sermons:sermon_delete' sermon.pk %}" class="btn btn-sm btn-outline-danger" title="Delete">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                            <a href="{% url 'sermons:sermon_pdf' sermon.pk %}" class="btn btn-sm btn-outline-accent" title="Download PDF">
+                                <i class="fas fa-file-pdf"></i>
+                            </a>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center py-4 text-muted">
+                            <i class="fas fa-microphone-alt fa-2x mb-2 d-block"></i>
+                            No sermons found.
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% if is_paginated %}
+    <nav class="mt-4" aria-label="Page navigation">
+        <ul class="pagination justify-content-center">
+            {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?{% if search_query %}q={{ search_query }}&{% endif %}{% if current_series %}series={{ current_series }}&{% endif %}page=1">&laquo; First</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?{% if search_query %}q={{ search_query }}&{% endif %}{% if current_series %}series={{ current_series }}&{% endif %}page={{ page_obj.previous_page_number }}">Previous</a>
+                </li>
+            {% endif %}
+            <li class="page-item active">
+                <span class="page-link">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+            </li>
+            {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?{% if search_query %}q={{ search_query }}&{% endif %}{% if current_series %}series={{ current_series }}&{% endif %}page={{ page_obj.next_page_number }}">Next</a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?{% if search_query %}q={{ search_query }}&{% endif %}{% if current_series %}series={{ current_series }}&{% endif %}page={{ page_obj.paginator.num_pages }}">Last &raquo;</a>
+                </li>
+            {% endif %}
+        </ul>
+    </nav>
+{% endif %}
+{% endblock %}

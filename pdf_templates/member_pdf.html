@@ -1,0 +1,246 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Member Profile</title>
+<style>
+@page {
+  size: A4;
+  margin: 18mm 22mm;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: 10.5px;
+  color: #2d2d2d;
+  line-height: 1.6;
+}
+
+/* ── Decorative header ── */
+.header-bar {
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(90deg, #1a1a2e 0%, #16213e 30%, #0f3460 60%, #e94560 100%);
+  border-radius: 2px;
+  margin-bottom: 16px;
+}
+.header {
+  text-align: center;
+  padding-bottom: 14px;
+  margin-bottom: 18px;
+  position: relative;
+}
+.header::after {
+  content: '';
+  display: block;
+  width: 60px;
+  height: 2px;
+  background: #e94560;
+  margin: 12px auto 0;
+  border-radius: 1px;
+}
+.header h1 {
+  font-size: 24px;
+  letter-spacing: 1.5px;
+  color: #1a1a2e;
+  font-weight: 700;
+}
+.header .tagline {
+  font-size: 10px;
+  color: #888;
+  margin-top: 3px;
+  font-style: italic;
+}
+.header .contact {
+  font-size: 8.5px;
+  color: #999;
+  margin-top: 5px;
+}
+
+/* ── Title ── */
+.title-section {
+  text-align: center;
+  margin-bottom: 22px;
+}
+.title-section .title {
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: #1a1a2e;
+}
+.title-section .title-sub {
+  font-size: 9px;
+  color: #aaa;
+  margin-top: 2px;
+  letter-spacing: 1px;
+}
+
+/* ── Photo ── */
+.photo-section {
+  text-align: center;
+  margin-bottom: 22px;
+}
+.photo-section img {
+  max-width: 120px;
+  max-height: 150px;
+  border: 3px solid #fff;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.12);
+  border-radius: 6px;
+}
+.photo-placeholder {
+  width: 120px;
+  height: 140px;
+  border: 2px dashed #ddd;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  color: #bbb;
+  background: #fafafa;
+}
+
+/* ── Table ── */
+table.details {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 1px 6px rgba(0,0,0,0.06);
+}
+table.details td {
+  padding: 6px 12px;
+  vertical-align: middle;
+  border-bottom: 1px solid #eee;
+}
+table.details tr:last-child td {
+  border-bottom: none;
+}
+table.details td.label {
+  width: 30%;
+  font-weight: 600;
+  color: #1a1a2e;
+  background-color: #f7f7fa;
+  letter-spacing: 0.3px;
+  font-size: 10px;
+  text-transform: uppercase;
+}
+table.details td.value {
+  width: 70%;
+  color: #333;
+}
+table.details tr:nth-child(even) td.value {
+  background-color: #fcfcfc;
+}
+
+/* ── Voter badges ── */
+.badge-voter {
+  display: inline-block;
+  background: linear-gradient(135deg, #17a2b8, #0d6efd);
+  color: #fff;
+  padding: 2px 10px;
+  border-radius: 12px;
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+.badge-nonvoter {
+  display: inline-block;
+  background: linear-gradient(135deg, #adb5bd, #6c757d);
+  color: #fff;
+  padding: 2px 10px;
+  border-radius: 12px;
+  font-size: 9px;
+  font-weight: 600;
+}
+
+/* ── Notes ── */
+.notes-box {
+  margin: 16px 0 10px;
+  padding: 12px 16px;
+  background: #fafafe;
+  border-left: 3px solid #0f3460;
+  border-radius: 4px;
+}
+.notes-box strong {
+  color: #1a1a2e;
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.notes-box p {
+  margin-top: 4px;
+  color: #444;
+  font-size: 10px;
+  line-height: 1.6;
+}
+
+/* ── Footer ── */
+.footer {
+  text-align: center;
+  font-size: 8.5px;
+  color: #bbb;
+  padding-top: 10px;
+  margin-top: 6px;
+}
+.footer span {
+  display: inline-block;
+  padding: 0 14px;
+}
+.footer .sep {
+  color: #ddd;
+}
+</style>
+</head>
+<body>
+<div class="header-bar"></div>
+<div class="header">
+  <h1>{{ church_info.name|default:"Grace Community Church" }}</h1>
+  {% if church_info.tagline %}<div class="tagline">{{ church_info.tagline }}</div>{% endif %}
+  <div class="contact">
+    {{ church_info.address|default:"123 Faith Avenue, Hope City" }}
+    <span class="sep">|</span>
+    {{ church_info.phone|default:"(555) 123-4567" }}
+    <span class="sep">|</span>
+    {{ church_info.email|default:"info@gcc.org" }}
+  </div>
+</div>
+<div class="title-section">
+  <div class="title">Member Profile</div>
+  <div class="title-sub">{{ member.membership_id }}</div>
+</div>
+<div class="photo-section">
+    {% if photo_path %}
+    <img src="{{ photo_path }}" alt="Member Photo">
+    {% else %}
+    <div class="photo-placeholder">No Photo</div>
+    {% endif %}
+</div>
+<table class="details">
+  <tr><td class="label">Full Name</td><td class="value">{{ member.full_name }}</td></tr>
+  <tr><td class="label">Gender</td><td class="value">{{ member.get_gender_display }}</td></tr>
+  <tr><td class="label">Date of Birth</td><td class="value">{{ member.date_of_birth|date:"F j, Y" }}</td></tr>
+  <tr><td class="label">Age</td><td class="value">{{ age }} years</td></tr>
+  <tr><td class="label">Phone</td><td class="value">{{ member.phone }}</td></tr>
+  <tr><td class="label">Email</td><td class="value">{{ member.email|default:"—" }}</td></tr>
+  <tr><td class="label">Address</td><td class="value">{{ member.address|linebreaksbr }}</td></tr>
+  <tr><td class="label">Marital Status</td><td class="value">{{ member.get_marital_status_display }}</td></tr>
+  <tr><td class="label">Occupation</td><td class="value">{{ member.occupation|default:"—" }}</td></tr>
+  <tr><td class="label">Baptism</td><td class="value">{{ member.get_baptism_status_display }}{% if member.baptism_date %} &middot; {{ member.baptism_date|date:"F j, Y" }}{% endif %}</td></tr>
+  <tr><td class="label">Joined</td><td class="value">{{ member.joining_date|date:"F j, Y" }}</td></tr>
+  <tr><td class="label">Voter Status</td><td class="value">{% if member.is_voter %}<span class="badge-voter">Registered Voter</span>{% else %}<span class="badge-nonvoter">Non-Voter</span>{% endif %}{% if member.is_voter and member.voter_id %} &nbsp; ID: {{ member.voter_id }}{% endif %}</td></tr>
+  <tr><td class="label">Emergency Contact</td><td class="value">{{ member.emergency_contact_name|default:"—" }}{% if member.emergency_contact_phone %} &middot; {{ member.emergency_contact_phone }}{% endif %}</td></tr>
+  <tr><td class="label">Emergency Relation</td><td class="value">{{ member.emergency_contact_relation|default:"—" }}</td></tr>
+</table>
+{% if member.notes %}
+<div class="notes-box">
+  <strong>Notes</strong>
+  <p>{{ member.notes|linebreaksbr }}</p>
+</div>
+{% endif %}
+<div class="footer">Generated on {{ generated_date }} &nbsp;<span class="sep">|</span>&nbsp; {{ church_info.name|default:"Grace Community Church" }}</div>
+</body>
+</html>

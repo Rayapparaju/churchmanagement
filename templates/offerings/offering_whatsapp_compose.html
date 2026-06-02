@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Send WhatsApp - {{ offering.receipt_number }}{% endblock %}
+
+{% block page_title %}Compose WhatsApp Message{% endblock %}
+
+{% block breadcrumb_items %}
+<li class="breadcrumb-item"><a href="{% url 'offerings:list' %}">Offerings</a></li>
+<li class="breadcrumb-item"><a href="{% url 'offerings:detail' offering.pk %}">{{ offering.receipt_number }}</a></li>
+<li class="breadcrumb-item active" aria-current="page">WhatsApp</li>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0"><i class="fa-brands fa-whatsapp me-2 text-success"></i>Send via Twilio WhatsApp API</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3 p-3 bg-light rounded">
+                    <div class="d-flex align-items-center gap-3">
+                        {% if offering.member.photo %}
+                        <img src="{{ offering.member.photo.url }}" alt="{{ offering.member.full_name }}"
+                             class="rounded-circle" style="width: 48px; height: 48px; object-fit: cover;">
+                        {% else %}
+                        <div class="rounded-circle bg-secondary text-white d-inline-flex align-items-center justify-content-center"
+                             style="width: 48px; height: 48px;">
+                            <i class="fa-solid fa-user fa-lg"></i>
+                        </div>
+                        {% endif %}
+                        <div>
+                            <h6 class="mb-0">{{ offering.member.full_name }}</h6>
+                            <small class="text-muted">{{ offering.member.phone }} &middot; {{ offering.receipt_number }}</small>
+                        </div>
+                    </div>
+                </div>
+
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="message" class="form-label">Message <span class="text-danger">*</span></label>
+                        <textarea name="message" id="message" rows="12"
+                                  class="form-control font-monospace" style="font-size: 0.9rem;"
+                                  required>{{ message }}</textarea>
+                        <div class="form-text">Edit the message above. It will be sent via Twilio WhatsApp API.</div>
+                    </div>
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-success">
+                            <i class="fa-brands fa-whatsapp me-1"></i>Send via WhatsApp
+                        </button>
+                        <a href="{% url 'offerings:detail' offering.pk %}" class="btn btn-outline-secondary">
+                            <i class="fa-solid fa-times me-1"></i>Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0"><i class="fa-solid fa-info-circle me-2"></i>Tips</h5>
+            </div>
+            <div class="card-body">
+                <ul class="mb-0 small">
+                    <li>Use <code>*text*</code> for <strong>bold</strong></li>
+                    <li>Use <code>_text_</code> for <em>italic</em></li>
+                    <li>Use <code>~text~</code> for strikethrough</li>
+                    <li>Use <code>```text```</code> for monospace</li>
+                    <li>Emoji supported — paste them directly</li>
+                    <li>The recipient must have opted in to receive WhatsApp messages from your Twilio number</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

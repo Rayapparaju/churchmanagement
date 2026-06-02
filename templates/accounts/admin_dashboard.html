@@ -1,0 +1,221 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Admin Dashboard - Grace Community Church{% endblock %}
+
+{% block page_title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2><i class="fa-solid fa-tachometer-alt me-2"></i>Dashboard Overview</h2>
+    <div class="page-actions">
+        <a href="{% url 'members:member_create' %}" class="btn btn-primary">
+            <i class="fa-solid fa-user-plus me-1"></i>Add Member
+        </a>
+        <a href="{% url 'events_app:event_create' %}" class="btn btn-success">
+            <i class="fa-solid fa-calendar-plus me-1"></i>Create Event
+        </a>
+        <a href="{% url 'offerings:create' %}" class="btn btn-warning text-white">
+            <i class="fa-solid fa-hand-holding-heart me-1"></i>Record Offering
+        </a>
+        <a href="{% url 'notices:notice_create' %}" class="btn btn-accent">
+            <i class="fa-solid fa-bullhorn me-1"></i>Post Notice
+        </a>
+    </div>
+</div>
+
+<!-- Top 4 Stat Cards -->
+<div class="row g-3 mb-4">
+    <div class="col-xl-3 col-md-6">
+        <div class="stat-card bg-primary-stat">
+            <i class="fa-solid fa-users stat-icon"></i>
+            <div class="stat-label">Total Members</div>
+            <div class="stat-value">{{ total_members }}</div>
+            <div class="stat-change"><i class="fa-regular fa-circle-check me-1"></i>Registered members</div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="stat-card bg-success-stat">
+            <i class="fa-solid fa-calendar-days stat-icon"></i>
+            <div class="stat-label">Upcoming Events</div>
+            <div class="stat-value">{{ total_events }}</div>
+            <div class="stat-change"><i class="fa-regular fa-clock me-1"></i>Scheduled</div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="stat-card bg-warning-stat">
+            <i class="fa-solid fa-hand-holding-heart stat-icon"></i>
+            <div class="stat-label">Total Offerings</div>
+            <div class="stat-value">₹{{ total_offerings|floatformat:2 }}</div>
+            <div class="stat-change"><i class="fa-regular fa-circle-up me-1"></i>All time</div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="stat-card bg-danger-stat">
+            <i class="fa-solid fa-book-bible stat-icon"></i>
+            <div class="stat-label">Total Sermons</div>
+            <div class="stat-value">{{ total_sermons }}</div>
+            <div class="stat-change"><i class="fa-regular fa-bookmark me-1"></i>Messages</div>
+        </div>
+    </div>
+</div>
+
+<!-- Row of 3 More Stat Cards -->
+<div class="row g-3 mb-4">
+    <div class="col-xl-4 col-md-4">
+        <div class="stat-card bg-info-stat">
+            <i class="fa-solid fa-hands-praying stat-icon"></i>
+            <div class="stat-label">Pending Prayers</div>
+            <div class="stat-value">{{ pending_prayers }}</div>
+            <div class="stat-change"><i class="fa-regular fa-clock me-1"></i>Awaiting response</div>
+        </div>
+    </div>
+    <div class="col-xl-4 col-md-4">
+        <div class="stat-card bg-dark-stat">
+            <i class="fa-solid fa-bullhorn stat-icon"></i>
+            <div class="stat-label">Active Notices</div>
+            <div class="stat-value">{{ active_notices }}</div>
+            <div class="stat-change"><i class="fa-regular fa-bell me-1"></i>Currently displayed</div>
+        </div>
+    </div>
+    <div class="col-xl-4 col-md-4">
+        <div class="stat-card" style="background: linear-gradient(135deg, #8e44ad, #6c3483);">
+            <i class="fa-solid fa-calendar-check stat-icon"></i>
+            <div class="stat-label">Weekly Attendance</div>
+            <div class="stat-value">{{ weekly_attendance }}</div>
+            <div class="stat-change"><i class="fa-regular fa-clock me-1"></i>Last 7 days</div>
+        </div>
+    </div>
+</div>
+
+<!-- Main Content Row -->
+<div class="row g-4">
+    <!-- Recent Members Table -->
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header">
+                <span class="card-title"><i class="fa-solid fa-users me-2 text-primary"></i>Recent Members</span>
+                <a href="{% url 'members:member_list' %}" class="btn btn-sm btn-outline-primary">View All</a>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-container">
+                    <table class="table table-striped mb-0">
+                        <thead>
+                            <tr>
+                                <th>Member</th>
+                                <th>ID</th>
+                                <th>Phone</th>
+                                <th>Joined</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for member in recent_members %}
+                            <tr>
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        {% if member.photo %}
+                                        <img src="{{ member.photo.url }}" alt="{{ member.full_name }}" class="profile-pic profile-pic-sm">
+                                        {% else %}
+                                        <div class="profile-pic profile-pic-sm profile-pic-initials" style="width:32px;height:32px;font-size:0.75rem;">
+                                            {{ member.full_name|first|upper }}
+                                        </div>
+                                        {% endif %}
+                                        <a href="{% url 'members:member_detail' member.id %}" class="text-decoration-none">{{ member.full_name }}</a>
+                                    </div>
+                                </td>
+                                <td><span class="badge bg-secondary">{{ member.membership_id }}</span></td>
+                                <td>{{ member.phone }}</td>
+                                <td>{{ member.joining_date|date:"M d, Y" }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center py-4 text-muted">No members added yet.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Upcoming Events -->
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header">
+                <span class="card-title"><i class="fa-solid fa-calendar-days me-2 text-success"></i>Upcoming Events</span>
+                <a href="{% url 'events_app:event_list' %}" class="btn btn-sm btn-outline-success">View All</a>
+            </div>
+            <div class="card-body">
+                {% for event in upcoming_events %}
+                <div class="d-flex align-items-start gap-3 mb-3 pb-3 border-bottom">
+                    <div class="text-center flex-shrink-0" style="width:50px;">
+                        <div class="fw-bold text-primary" style="font-size:1.1rem;">{{ event.date|date:"d" }}</div>
+                        <div class="small text-muted text-uppercase">{{ event.date|date:"M" }}</div>
+                    </div>
+                    <div class="flex-grow-1">
+                        <h6 class="mb-1">{{ event.title }}</h6>
+                        <p class="mb-1 small text-muted">
+                            <i class="fa-regular fa-clock me-1"></i>{{ event.time|time:"g:i A" }}
+                            <i class="fa-solid fa-location-dot ms-2 me-1"></i>{{ event.location }}
+                        </p>
+                    </div>
+                    <a href="{% url 'events_app:event_detail' event.id %}" class="btn btn-sm btn-outline-primary flex-shrink-0">
+                        <i class="fa-regular fa-eye"></i>
+                    </a>
+                </div>
+                {% empty %}
+                <div class="empty-state">
+                    <i class="fa-regular fa-calendar"></i>
+                    <h5>No Upcoming Events</h5>
+                    <p class="small">Schedule your first event to get started.</p>
+                    <a href="{% url 'events_app:event_create' %}" class="btn btn-sm btn-success">
+                        <i class="fa-solid fa-plus me-1"></i>Create Event
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Recent Offerings Table -->
+<div class="row g-4 mt-2">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <span class="card-title"><i class="fa-solid fa-hand-holding-heart me-2 text-warning"></i>Recent Offerings</span>
+                <a href="{% url 'offerings:list' %}" class="btn btn-sm btn-outline-warning">View All</a>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-container">
+                    <table class="table table-striped mb-0">
+                        <thead>
+                            <tr>
+                                <th>Member</th>
+                                <th>Type</th>
+                                <th>Amount</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for offering in recent_offerings %}
+                            <tr>
+                                <td>{{ offering.member.full_name|default:"Anonymous" }}</td>
+                                <td><span class="badge bg-info">{{ offering.get_offering_type_display }}</span></td>
+                                <td><strong>₹{{ offering.amount|floatformat:2 }}</strong></td>
+                                <td>{{ offering.date|date:"M d, Y" }}</td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" class="text-center py-4 text-muted">No offerings recorded yet.</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

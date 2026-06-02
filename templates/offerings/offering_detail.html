@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Offering {{ offering.receipt_number }}{% endblock %}
+
+{% block page_title %}Offering Details{% endblock %}
+
+{% block breadcrumb_items %}
+<li class="breadcrumb-item"><a href="{% url 'offerings:list' %}">Offerings</a></li>
+<li class="breadcrumb-item active" aria-current="page">{{ offering.receipt_number }}</li>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card text-center mb-4">
+            <div class="card-body py-4">
+                <h2 class="text-muted mb-1">Receipt #</h2>
+                <h1 class="display-5 fw-bold text-accent mb-0"><code>{{ offering.receipt_number }}</code></h1>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0"><i class="fa-solid fa-receipt me-2"></i>Offering Information</h5>
+            </div>
+            <div class="card-body">
+                <table class="table table-sm table-borderless mb-0">
+                    <tr>
+                        <td class="text-muted" style="width: 160px;">Date</td>
+                        <td class="fw-semibold">{{ offering.date|date:"F j, Y" }}</td>
+                    </tr>
+                    <tr>
+                        <td class="text-muted">Member</td>
+                        <td>
+                            {% if offering.member %}
+                            <a href="{% url 'members:member_detail' offering.member.pk %}" class="text-decoration-none fw-semibold">
+                                {{ offering.member.full_name }}
+                            </a>
+                            {% else %}
+                            <span class="text-muted">&mdash;</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="text-muted">Offering Type</td>
+                        <td><span class="badge bg-info fs-6">{{ offering.get_offering_type_display }}</span></td>
+                    </tr>
+                    <tr>
+                        <td class="text-muted">Amount</td>
+                        <td class="fw-bold fs-5 text-accent">₹{{ offering.amount|floatformat:2 }}</td>
+                    </tr>
+                    <tr>
+                        <td class="text-muted">Payment Method</td>
+                        <td>{{ offering.get_payment_method_display }}</td>
+                    </tr>
+                    {% if offering.notes %}
+                    <tr>
+                        <td class="text-muted">Notes</td>
+                        <td>{{ offering.notes|linebreaksbr }}</td>
+                    </tr>
+                    {% endif %}
+                    <tr>
+                        <td class="text-muted">Recorded At</td>
+                        <td>{{ offering.created_at|date:"M d, Y g:i A" }}</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <div class="d-flex justify-content-between">
+            <a href="{% url 'offerings:list' %}" class="btn btn-outline-secondary">
+                <i class="fa-solid fa-arrow-left me-1"></i>Back to List
+            </a>
+            <div class="d-flex gap-2">
+                {% if offering.member and offering.member.phone %}
+                <a href="{{ offering.whatsapp_url }}" target="_blank" class="btn btn-success" title="Open WhatsApp">
+                    <i class="fa-brands fa-whatsapp me-1"></i>Share Link
+                </a>
+                <a href="{% url 'offerings:send_whatsapp' offering.pk %}" class="btn btn-success" title="Send via Twilio API">
+                    <i class="fa-brands fa-whatsapp me-1"></i>Send API
+                </a>
+                {% endif %}
+                <a href="{% url 'offerings:receipt' offering.pk %}" class="btn btn-accent">
+                    <i class="fa-solid fa-file-pdf me-1"></i>Receipt PDF
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

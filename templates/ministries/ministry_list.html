@@ -1,0 +1,162 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Church Ministries{% endblock %}
+
+{% block page_title %}Church Ministries{% endblock %}
+
+{% block breadcrumb_items %}
+<li class="breadcrumb-item active" aria-current="page">Ministries</li>
+{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-5">
+        <form method="GET" action="{% url 'ministries:list' %}" class="d-flex">
+            <div class="input-group">
+                <input type="text" name="q" class="form-control" placeholder="Search ministries..." value="{{ search_query }}">
+                <button class="btn btn-accent" type="submit">
+                    <i class="fa-solid fa-search"></i>
+                </button>
+                {% if search_query %}
+                <a href="{% url 'ministries:list' %}" class="btn btn-outline-secondary">
+                    <i class="fa-solid fa-times"></i>
+                </a>
+                {% endif %}
+            </div>
+        </form>
+    </div>
+    <div class="col-md-7 text-md-end mt-2 mt-md-0">
+        <div class="btn-group me-2">
+            <a href="{% url 'ministries:list' %}?status=active" class="btn btn-outline-secondary btn-sm {% if status_filter == 'active' %}active{% endif %}">Active</a>
+            <a href="{% url 'ministries:list' %}?status=inactive" class="btn btn-outline-secondary btn-sm {% if status_filter == 'inactive' %}active{% endif %}">Inactive</a>
+            {% if status_filter %}
+            <a href="{% url 'ministries:list' %}" class="btn btn-outline-secondary btn-sm">All</a>
+            {% endif %}
+        </div>
+        <a href="{% url 'ministries:create' %}" class="btn btn-accent">
+            <i class="fa-solid fa-plus me-1"></i>Add Ministry
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    {% for ministry in ministries %}
+    <div class="col-lg-4 col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <h5 class="card-title mb-0">
+                        <a href="{% url 'ministries:detail' ministry.pk %}" class="text-decoration-none">
+                            {{ ministry.name }}
+                        </a>
+                    </h5>
+                    {% if ministry.is_active %}
+                    <span class="badge bg-success">Active</span>
+                    {% else %}
+                    <span class="badge bg-secondary">Inactive</span>
+                    {% endif %}
+                </div>
+                <p class="card-text text-muted small mb-3">
+                    {% if ministry.description %}
+                    {{ ministry.description|truncatewords:25 }}
+                    {% else %}
+                    <span class="fst-italic">No description</span>
+                    {% endif %}
+                </p>
+                <ul class="list-unstyled mb-0 small">
+                    {% if ministry.leader %}
+                    <li class="mb-1">
+                        <i class="fa-solid fa-user text-accent me-2"></i>{{ ministry.leader }}
+                    </li>
+                    {% endif %}
+                    {% if ministry.meeting_schedule %}
+                    <li class="mb-1">
+                        <i class="fa-solid fa-clock text-accent me-2"></i>{{ ministry.meeting_schedule }}
+                    </li>
+                    {% endif %}
+                    <li>
+                        <i class="fa-solid fa-users text-accent me-2"></i>{{ ministry.members.count }} member{{ ministry.members.count|pluralize }}
+                    </li>
+                </ul>
+            </div>
+            <div class="card-footer bg-transparent">
+                <div class="d-flex justify-content-between">
+                    <a href="{% url 'ministries:detail' ministry.pk %}" class="btn btn-sm btn-outline-primary" title="View">
+                        <i class="fa-solid fa-eye"></i>
+                    </a>
+                    <a href="{% url 'ministries:update' ministry.pk %}" class="btn btn-sm btn-outline-secondary" title="Edit">
+                        <i class="fa-solid fa-edit"></i>
+                    </a>
+                    <button type="button" class="btn btn-sm btn-outline-danger" title="Delete"
+                            data-bs-toggle="modal" data-bs-target="#confirmDeleteModal"
+                            data-delete-url="{% url 'ministries:delete' ministry.pk %}"
+                            data-item-name="{{ ministry.name }}">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% empty %}
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body text-center py-5">
+                <i class="fa-solid fa-church fa-3x text-muted mb-3"></i>
+                <p class="text-muted mb-0">
+                    {% if search_query %}
+                    No ministries found matching "{{ search_query }}".
+                    {% else %}
+                    No ministries established yet.
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+{% if is_paginated %}
+<div class="card mt-3">
+    <div class="card-footer">
+        <nav>
+            <ul class="pagination justify-content-center mb-0">
+                {% if page_obj.has_previous %}
+                <li class="page-item">
+                    <a class="page-link" href="?page=1{% if search_query %}&q={{ search_query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}">
+                        <i class="fa-solid fa-angle-double-left"></i>
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}">
+                        <i class="fa-solid fa-angle-left"></i>
+                    </a>
+                </li>
+                {% endif %}
+                {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                <li class="page-item active"><span class="page-link">{{ num }}</span></li>
+                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ num }}{% if search_query %}&q={{ search_query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}">{{ num }}</a>
+                </li>
+                {% endif %}
+                {% endfor %}
+                {% if page_obj.has_next %}
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}">
+                        <i class="fa-solid fa-angle-right"></i>
+                    </a>
+                </li>
+                <li class="page-item">
+                    <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if search_query %}&q={{ search_query }}{% endif %}{% if status_filter %}&status={{ status_filter }}{% endif %}">
+                        <i class="fa-solid fa-angle-double-right"></i>
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

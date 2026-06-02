@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Receipt - {{ offering.receipt_number }}</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 20mm;
+        }
+        body {
+            font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+            color: #333;
+            font-size: 14px;
+            line-height: 1.6;
+            padding: 40px;
+        }
+        .header {
+            text-align: center;
+            border-bottom: 3px double #1a365d;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            font-size: 28px;
+            font-weight: 800;
+            color: #1a365d;
+            margin: 0 0 4px;
+        }
+        .header p {
+            color: #666;
+            margin: 0;
+            font-size: 14px;
+        }
+        .receipt-meta {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            font-size: 15px;
+        }
+        .receipt-meta .label {
+            color: #888;
+        }
+        .receipt-meta .value {
+            font-weight: 600;
+            color: #1a365d;
+        }
+        .member-info {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 16px 20px;
+            margin-bottom: 30px;
+        }
+        .member-info h3 {
+            font-size: 14px;
+            color: #888;
+            margin: 0 0 6px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .member-info p {
+            font-size: 16px;
+            font-weight: 600;
+            margin: 0;
+            color: #1a365d;
+        }
+        .details-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+        }
+        .details-table th,
+        .details-table td {
+            padding: 10px 16px;
+            text-align: left;
+            border-bottom: 1px solid #dee2e6;
+        }
+        .details-table th {
+            background: #f1f5f9;
+            font-weight: 600;
+            color: #1a365d;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .details-table .amount {
+            font-size: 22px;
+            font-weight: 800;
+            color: #1a365d;
+        }
+        .thank-you {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 2px solid #e2e8f0;
+        }
+        .thank-you h2 {
+            font-size: 20px;
+            color: #1a365d;
+            margin: 0 0 6px;
+        }
+        .thank-you p {
+            color: #666;
+            margin: 0;
+            font-size: 14px;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            font-size: 12px;
+            color: #aaa;
+        }
+        @media print {
+            body { padding: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Grace Community Church</h1>
+        <p>Your Address &bull; City, State ZIP &bull; (555) 123-4567</p>
+        <p>Email: info@gracechurch.org</p>
+    </div>
+
+    <div class="receipt-meta">
+        <div>
+            <span class="label">Receipt #:</span>
+            <span class="value">{{ offering.receipt_number }}</span>
+        </div>
+        <div>
+            <span class="label">Date:</span>
+            <span class="value">{{ offering.date|date:"F j, Y" }}</span>
+        </div>
+    </div>
+
+    <div class="member-info">
+        <h3>Member</h3>
+        <p>{% if offering.member %}{{ offering.member.full_name }}{% else %}Anonymous{% endif %}</p>
+    </div>
+
+    <table class="details-table">
+        <thead>
+            <tr>
+                <th>Offering Type</th>
+                <th>Payment Method</th>
+                <th style="text-align: right;">Amount</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>{{ offering.get_offering_type_display }}</td>
+                <td>{{ offering.get_payment_method_display }}</td>
+                <td style="text-align: right;" class="amount">₹{{ offering.amount|floatformat:2 }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    {% if offering.notes %}
+    <div class="member-info">
+        <h3>Notes</h3>
+        <p style="font-weight: 400;">{{ offering.notes }}</p>
+    </div>
+    {% endif %}
+
+    <div class="thank-you">
+        <h2>Thank You for Your Generosity!</h2>
+        <p>"Each of you should give what you have decided in your heart to give, not reluctantly or under compulsion, for God loves a cheerful giver." &mdash; 2 Corinthians 9:7</p>
+    </div>
+
+    <div class="footer">
+        This is a computer-generated receipt. No signature is required.
+    </div>
+</body>
+</html>

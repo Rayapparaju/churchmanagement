@@ -1,0 +1,158 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Pastor Dashboard - Grace Community Church{% endblock %}
+
+{% block page_title %}Pastor Dashboard{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h2><i class="fa-solid fa-tachometer-alt me-2"></i>Dashboard Overview</h2>
+    <div class="page-actions">
+        <a href="{% url 'sermons:sermon_create' %}" class="btn btn-primary">
+            <i class="fa-solid fa-book-bible me-1"></i>Add Sermon
+        </a>
+        <a href="{% url 'prayers:prayer_list' %}" class="btn btn-warning text-white">
+            <i class="fa-solid fa-hands-praying me-1"></i>View Prayer Requests
+        </a>
+        <a href="{% url 'attendance:mark_attendance' %}" class="btn btn-success">
+            <i class="fa-solid fa-calendar-check me-1"></i>Mark Attendance
+        </a>
+    </div>
+</div>
+
+<!-- Stat Cards -->
+<div class="row g-3 mb-4">
+    <div class="col-xl-3 col-md-6">
+        <div class="stat-card bg-primary-stat">
+            <i class="fa-solid fa-users stat-icon"></i>
+            <div class="stat-label">Total Members</div>
+            <div class="stat-value">{{ total_members }}</div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="stat-card bg-success-stat">
+            <i class="fa-solid fa-calendar-days stat-icon"></i>
+            <div class="stat-label">Upcoming Events</div>
+            <div class="stat-value">{{ total_events }}</div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="stat-card bg-warning-stat">
+            <i class="fa-solid fa-hands-praying stat-icon"></i>
+            <div class="stat-label">Pending Prayers</div>
+            <div class="stat-value">{{ pending_prayers }}</div>
+            <div class="stat-change">
+                <a href="{% url 'prayers:prayer_list' %}" class="text-white text-decoration-none">
+                    <i class="fa-regular fa-arrow-right me-1"></i>Review requests
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-3 col-md-6">
+        <div class="stat-card bg-info-stat">
+            <i class="fa-solid fa-calendar-check stat-icon"></i>
+            <div class="stat-label">Weekly Attendance</div>
+            <div class="stat-value">{{ weekly_attendance }}</div>
+        </div>
+    </div>
+</div>
+
+<!-- Main Content Row -->
+<div class="row g-4">
+    <!-- Upcoming Events -->
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header">
+                <span class="card-title"><i class="fa-solid fa-calendar-days me-2 text-success"></i>Upcoming Events</span>
+                <a href="{% url 'events_app:event_list' %}" class="btn btn-sm btn-outline-success">View All</a>
+            </div>
+            <div class="card-body">
+                {% for event in upcoming_events %}
+                <div class="d-flex align-items-start gap-3 mb-3 pb-3 border-bottom">
+                    <div class="text-center flex-shrink-0" style="width:50px;">
+                        <div class="fw-bold text-success" style="font-size:1.1rem;">{{ event.date|date:"d" }}</div>
+                        <div class="small text-muted text-uppercase">{{ event.date|date:"M" }}</div>
+                    </div>
+                    <div class="flex-grow-1">
+                        <h6 class="mb-1">{{ event.title }}</h6>
+                        <p class="mb-1 small text-muted">
+                            <i class="fa-regular fa-clock me-1"></i>{{ event.time|time:"g:i A" }}
+                            <i class="fa-solid fa-location-dot ms-2 me-1"></i>{{ event.location }}
+                        </p>
+                    </div>
+                    <a href="{% url 'events_app:event_detail' event.id %}" class="btn btn-sm btn-outline-primary flex-shrink-0">
+                        <i class="fa-regular fa-eye"></i>
+                    </a>
+                </div>
+                {% empty %}
+                <div class="empty-state">
+                    <i class="fa-regular fa-calendar"></i>
+                    <h5>No Upcoming Events</h5>
+                    <p class="small">No events scheduled at this time.</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Sermons Overview -->
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header">
+                <span class="card-title"><i class="fa-solid fa-book-bible me-2 text-danger"></i>Sermons</span>
+                <a href="{% url 'sermons:sermon_list' %}" class="btn btn-sm btn-outline-danger">View All</a>
+            </div>
+            <div class="card-body text-center">
+                <div class="py-3">
+                    <i class="fa-solid fa-scroll text-danger" style="font-size:3rem;opacity:0.5;"></i>
+                    <h3 class="mt-2 mb-1">{{ total_sermons }}</h3>
+                    <p class="text-muted mb-0">Total Sermons</p>
+                </div>
+                <a href="{% url 'sermons:sermon_create' %}" class="btn btn-danger">
+                    <i class="fa-solid fa-plus me-1"></i>Add New Sermon
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bottom Row: Prayer Requests Overview -->
+<div class="row g-4 mt-2">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <span class="card-title"><i class="fa-solid fa-hands-praying me-2 text-warning"></i>Prayer Requests Summary</span>
+                <a href="{% url 'prayers:prayer_list' %}" class="btn btn-sm btn-outline-warning">Manage Requests</a>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-md-3 col-6 text-center">
+                        <h3 class="text-warning mb-0">{{ pending_prayers }}</h3>
+                        <small class="text-muted">Pending</small>
+                    </div>
+                    <div class="col-md-3 col-6 text-center">
+                        <h3 class="text-success mb-0">0</h3>
+                        <small class="text-muted">Prayed For</small>
+                    </div>
+                    <div class="col-md-3 col-6 text-center">
+                        <h3 class="text-info mb-0">0</h3>
+                        <small class="text-muted">Answered</small>
+                    </div>
+                    <div class="col-md-3 col-6 text-center">
+                        <h3 class="text-secondary mb-0">0</h3>
+                        <small class="text-muted">Closed</small>
+                    </div>
+                </div>
+                {% if pending_prayers > 0 %}
+                <div class="text-center mt-3">
+                    <a href="{% url 'prayers:prayer_list' %}?status=pending" class="btn btn-warning text-white">
+                        <i class="fa-solid fa-arrow-right me-1"></i>View {{ pending_prayers }} Pending Request{{ pending_prayers|pluralize }}
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

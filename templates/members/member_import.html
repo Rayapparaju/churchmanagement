@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Import Members from Excel{% endblock %}
+
+{% block page_title %}Import Members{% endblock %}
+
+{% block breadcrumb_items %}
+<li class="breadcrumb-item"><a href="{% url 'members:member_list' %}">Members</a></li>
+<li class="breadcrumb-item active" aria-current="page">Import</li>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0"><i class="fa-solid fa-file-excel me-2"></i>Import from Excel</h5>
+            </div>
+            <div class="card-body">
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="mb-4">
+                        <label for="excel_file" class="form-label">Select Excel File <span class="text-danger">*</span></label>
+                        <input type="file" name="excel_file" id="excel_file"
+                               class="form-control" accept=".xlsx,.xls" required>
+                        <div class="form-text">Upload a .xlsx or .xls file with member data.
+                            <a href="{% url 'members:member_import_sample' %}" class="ms-2" target="_blank">
+                                <i class="fa-solid fa-download me-1"></i>Download sample template
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-accent">
+                            <i class="fa-solid fa-upload me-1"></i>Import
+                        </button>
+                        <a href="{% url 'members:member_list' %}" class="btn btn-outline-secondary">
+                            <i class="fa-solid fa-arrow-left me-1"></i>Back to List
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="card mt-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0"><i class="fa-solid fa-info-circle me-2"></i>Excel Format Guide</h5>
+            </div>
+            <div class="card-body">
+                <p class="mb-2">The first row must contain column headers. Required columns:</p>
+                <div class="table-responsive">
+                    <table class="table table-sm table-bordered">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Column</th>
+                                <th>Required</th>
+                                <th>Description</th>
+                                <th>Accepted Values</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><code>first_name</code></td><td><span class="badge bg-danger">Required</span></td><td>Member's first name</td><td>Any text</td></tr>
+                            <tr><td><code>last_name</code></td><td><span class="badge bg-danger">Required</span></td><td>Member's last name</td><td>Any text</td></tr>
+                            <tr><td><code>gender</code></td><td><span class="badge bg-danger">Required</span></td><td>Gender</td><td><code>male</code>, <code>female</code>, <code>other</code></td></tr>
+                            <tr><td><code>date_of_birth</code></td><td><span class="badge bg-danger">Required</span></td><td>Date of birth</td><td><code>YYYY-MM-DD</code> or <code>DD/MM/YYYY</code></td></tr>
+                            <tr><td><code>phone</code></td><td><span class="badge bg-danger">Required</span></td><td>Phone number</td><td>Any text</td></tr>
+                            <tr><td><code>address</code></td><td><span class="badge bg-danger">Required</span></td><td>Residential address</td><td>Any text</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p class="mb-2 mt-3">Optional columns:</p>
+                <div class="table-responsive">
+                    <table class="table table-sm table-bordered">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Column</th>
+                                <th>Accepted Values</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><code>email</code></td><td>Valid email address</td></tr>
+                            <tr><td><code>occupation</code></td><td>Any text</td></tr>
+                            <tr><td><code>marital_status</code></td><td><code>single</code>, <code>married</code>, <code>divorced</code>, <code>widowed</code></td></tr>
+                            <tr><td><code>baptism_status</code></td><td><code>water</code>, <code>holy_spirit</code>, <code>both</code>, <code>none</code></td></tr>
+                            <tr><td><code>baptism_date</code></td><td><code>YYYY-MM-DD</code> or <code>DD/MM/YYYY</code></td></tr>
+                            <tr><td><code>joining_date</code></td><td><code>YYYY-MM-DD</code> or <code>DD/MM/YYYY</code> (defaults to today)</td></tr>
+                            <tr><td><code>emergency_contact_name</code></td><td>Any text</td></tr>
+                            <tr><td><code>emergency_contact_phone</code></td><td>Any text</td></tr>
+                            <tr><td><code>emergency_contact_relation</code></td><td>Any text</td></tr>
+                            <tr><td><code>is_active</code></td><td><code>yes</code>/<code>true</code>/<code>1</code> or <code>no</code>/<code>false</code>/<code>0</code> (defaults to yes)</td></tr>
+                            <tr><td><code>is_voter</code></td><td><code>yes</code>/<code>true</code>/<code>1</code> or <code>no</code>/<code>false</code>/<code>0</code></td></tr>
+                            <tr><td><code>voter_id</code></td><td>Any text</td></tr>
+                            <tr><td><code>notes</code></td><td>Any text</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p class="text-muted small mt-2">
+                    <i class="fa-solid fa-lightbulb me-1"></i>
+                    Column headers are case-insensitive. Common variations like <code>dob</code>, <code>phone number</code>, <code>first name</code> are also recognized.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

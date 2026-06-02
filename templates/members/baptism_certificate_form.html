@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Baptism Certificate for {{ member.full_name }}{% endblock %}
+
+{% block page_title %}Issue Baptism Certificate{% endblock %}
+
+{% block breadcrumb_items %}
+<li class="breadcrumb-item"><a href="{% url 'members:member_list' %}">Members</a></li>
+<li class="breadcrumb-item"><a href="{% url 'members:member_detail' member.pk %}">{{ member.full_name }}</a></li>
+<li class="breadcrumb-item active" aria-current="page">Baptism Certificate</li>
+{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-6">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="card-title mb-0"><i class="fa-solid fa-cross me-2"></i>New Baptism Certificate</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-4 p-3 bg-light rounded">
+                    <div class="d-flex align-items-center gap-3">
+                        {% if member.photo %}
+                        <img src="{{ member.photo.url }}" alt="{{ member.full_name }}"
+                             class="rounded-circle" style="width: 56px; height: 56px; object-fit: cover;">
+                        {% else %}
+                        <div class="rounded-circle bg-secondary text-white d-inline-flex align-items-center justify-content-center"
+                             style="width: 56px; height: 56px;">
+                            <i class="fa-solid fa-user fa-xl"></i>
+                        </div>
+                        {% endif %}
+                        <div>
+                            <h6 class="mb-0">{{ member.full_name }}</h6>
+                            <small class="text-muted">{{ member.membership_id }} &middot; {{ member.get_baptism_status_display }}</small>
+                        </div>
+                    </div>
+                </div>
+
+                <form method="post" novalidate>
+                    {% csrf_token %}
+
+                    {% if form.non_field_errors %}
+                    <div class="alert alert-danger">{{ form.non_field_errors }}</div>
+                    {% endif %}
+
+                    <div class="mb-3">
+                        <label for="{{ form.baptism_date.id_for_label }}" class="form-label">Baptism Date</label>
+                        <input type="date" name="{{ form.baptism_date.name }}"
+                               value="{{ form.baptism_date.value|date:'Y-m-d'|default:'' }}"
+                               class="form-control {% if form.baptism_date.errors %}is-invalid{% endif %}"
+                               id="{{ form.baptism_date.id_for_label }}" required>
+                        {% if form.baptism_date.errors %}
+                        <div class="invalid-feedback">{{ form.baptism_date.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="{{ form.baptism_type.id_for_label }}" class="form-label">Baptism Type</label>
+                        <select name="{{ form.baptism_type.name }}"
+                                class="form-select {% if form.baptism_type.errors %}is-invalid{% endif %}"
+                                id="{{ form.baptism_type.id_for_label }}">
+                            <option value="water" {% if form.baptism_type.value == 'water' %}selected{% endif %}>Water Baptism</option>
+                            <option value="holy_spirit" {% if form.baptism_type.value == 'holy_spirit' %}selected{% endif %}>Holy Spirit Baptism</option>
+                            <option value="both" {% if form.baptism_type.value == 'both' %}selected{% endif %}>Both</option>
+                        </select>
+                        {% if form.baptism_type.errors %}
+                        <div class="invalid-feedback">{{ form.baptism_type.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="{{ form.officiated_by.id_for_label }}" class="form-label">Officiated By (Pastor)</label>
+                        <input type="text" name="{{ form.officiated_by.name }}"
+                               value="{{ form.officiated_by.value|default:'' }}"
+                               class="form-control {% if form.officiated_by.errors %}is-invalid{% endif %}"
+                               id="{{ form.officiated_by.id_for_label }}" placeholder="e.g. Pastor John Doe">
+                        {% if form.officiated_by.errors %}
+                        <div class="invalid-feedback">{{ form.officiated_by.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="{{ form.notes.id_for_label }}" class="form-label">Notes <small class="text-muted">(optional)</small></label>
+                        <textarea name="{{ form.notes.name }}" rows="3"
+                                  class="form-control {% if form.notes.errors %}is-invalid{% endif %}"
+                                  id="{{ form.notes.id_for_label }}">{{ form.notes.value|default:'' }}</textarea>
+                        {% if form.notes.errors %}
+                        <div class="invalid-feedback">{{ form.notes.errors }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-accent">
+                            <i class="fa-solid fa-cross me-1"></i>Create Certificate
+                        </button>
+                        <a href="{% url 'members:member_detail' member.pk %}" class="btn btn-outline-secondary">
+                            <i class="fa-solid fa-times me-1"></i>Cancel
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
